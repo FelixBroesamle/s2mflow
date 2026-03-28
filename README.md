@@ -49,7 +49,7 @@ network = s2mflow.load_min_instance("input_file")
 # 2. Generate multicommodity data for 3 commodities
 mc_data = s2mflow.generate_multi_commodity_data(
     instance=network,
-    num_commodities=5,
+    num_commodities=3,
     is_uniform=False,
     seed=42,
 )

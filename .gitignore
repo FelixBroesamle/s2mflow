@@ -8,9 +8,18 @@ __pycache__/
 *$py.class
 *.so
 *.pyd
+*.pdb
+*.pds
+*.dylib
 .venv/
 dist/
 
 # IDEs
 .idea/
 .vscode/
+.DS_Store
+
+.env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/

@@ -212,5 +212,8 @@ fn s2mflow(
     m.add_function(wrap_pyfunction!(get_incidence_mapping, m)?)?;
     m.add_class::<models::Edge>()?;
     m.add_class::<models::NetworkInstance>()?;
+    m.add_class::<models::MultiCommoditySupplies>()?;
+    m.add_class::<models::MultiCommodityData>()?;
+    m.add_class::<models::ParsedMulticommodityInstance>()?;
     Ok(())
 }

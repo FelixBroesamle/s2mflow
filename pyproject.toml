@@ -35,3 +35,7 @@ include = ["s2mflow/py.typed"]
 
 [tool.poetry]
 packages = [{ include = "s2mflow" }]
+[dependency-groups]
+dev = [
+    "maturin (>=1.12.6,<2.0.0)"
+]

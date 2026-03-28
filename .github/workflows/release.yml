@@ -28,7 +28,7 @@ jobs:
         uses: PyO3/maturin-action@v1
         with:
           target: ${{ matrix.target }}
-          args: --release --out dist
+          args: --release --out dist ${{ matrix.target == 'aarch64' && '-i 3.13' || '' }}
           manylinux: 2_28
 
       - name: Upload wheels

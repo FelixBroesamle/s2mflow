@@ -1,0 +1,33 @@
+[project]
+name = "s2mflow"
+version = "0.1.0"
+description = "Meta-generator: generating multicommodity flow instances from single-commodity flow instances."
+authors = [
+    {name = "Felix P. Broesamle",email = "felix.broesamle@kit.edu"}
+]
+readme = {file = "README.md", content-type = "text/markdown"}
+requires-python = ">=3.13"
+license = {text = "MIT"}
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Intended Audience :: Education",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Rust",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Mathematics",
+]
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/FelixBroesamle/s2mflow"
+Repository = "https://github.com/FelixBroesamle/s2mflow"
+Issues = "https://github.com/FelixBroesamle/s2mflow/issues"
+
+[build-system]
+requires = ["maturin>=1.0,<2.0"]
+build-backend = "maturin"
+
+[tool.maturin]
+module-name = "s2mflow.s2mflow"

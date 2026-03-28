@@ -1,0 +1,15 @@
+[package]
+name = "s2mflow"
+version = "0.1.0"
+edition = "2021"
+description = "Meta-generator: generating multicommodity flow instances from single-commodity flow instances."
+
+[lib]
+name = "s2mflow"
+crate-type = ["cdylib"]
+
+[dependencies]
+pyo3 = { version = "0.28.2", features = ["extension-module"] }
+rand = "0.10.0"
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = "1.0.149"

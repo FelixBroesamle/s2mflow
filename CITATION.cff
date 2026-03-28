@@ -3,20 +3,11 @@ message: "If you use this software, please cite it as below."
 authors:
 - family-names: "Broesamle"
   given-names: "Felix P."
-title: "s2mflow: A Meta-generator for Multi-Commodity Flow Instances"
+  affiliation: "Discrete Optimization and Logistics, Institute for Operations Research, Karlsruhe Institute of Technology"
+- family-names: "Nickel"
+  given-names: "Stefan"
+  affiliation: "Discrete Optimization and Logistics, Institute for Operations Research, Karlsruhe Institute of Technology"
+title: "s2mflow: A Meta-generator for Multicommodity Flow Instances"
 version: 0.1.0
 date-released: 2026-03-31
 url: "https://github.com/FelixBroesamle/s2mflow"
-
-preferred-citation:
-  type: article
-  authors:
-    - family-names: "Broesamle"
-      given-names: "Felix P."
-    - family-names: "Nickel"
-      given-names: "Stefan"
-  title: "On the Single-Multi-Commodity Gap: Lifting Single to Multicommodity Flow Instances"
-  year: 2026
-  journal: "arXiv preprint arXiv:2603.XXXXX"
-  url: "https://arxiv.org/abs/2603.XXXXX"
-  

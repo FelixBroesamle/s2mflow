@@ -31,3 +31,7 @@ build-backend = "maturin"
 
 [tool.maturin]
 module-name = "s2mflow.s2mflow"
+include = ["s2mflow/py.typed"]
+
+[tool.poetry]
+packages = [{ include = "s2mflow" }]

@@ -8,6 +8,5 @@ authors:
   given-names: "Stefan"
   affiliation: "Discrete Optimization and Logistics, Institute for Operations Research, Karlsruhe Institute of Technology"
 title: "s2mflow: A Meta-generator for Multicommodity Flow Instances"
-version: 0.1.0
 date-released: 2026-03-28
 url: "https://github.com/FelixBroesamle/s2mflow"

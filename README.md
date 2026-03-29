@@ -80,7 +80,6 @@ If you use `s2mflow` in your research, please cite the software:
 @software{s2mflow2026,
   author = {Broesamle, Felix P. and Nickel, Stefan},
   title = {s2mflow: A Meta-generator for Multicommodity Flow Instances},
-  version = {0.1.0},
   year = {2026},
   url = {https://github.com/FelixBroesamle/s2mflow}
 }

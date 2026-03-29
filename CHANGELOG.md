@@ -5,11 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this
 
+## [0.1.2] - 2026-03-29
+
+### Fixed
+- Refined definitions for `uniform` and `spread` partitioning logic.
+- Corrected `README.md`.
+
 ## [0.1.1] - 2026-03-29
 
 ### Fixed
 - Updated license information.
-- Corrected `README.md`.
+- Fixed minors in `README.md`.
 
 ## [Unreleased]
 

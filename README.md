@@ -85,6 +85,11 @@ If you use `s2mflow` in your research, please cite the software:
 }
 ```
 
+## Resources
+
+- **Documentation**: [s2mflow.readthedocs.io](https://s2mflow.readthedocs.io/en/latest/)
+- **PyPI Package**: [pypi.org/project/s2mflow](https://pypi.org/project/s2mflow/)
+
 ## License
 
 Distributed under the MIT License. See `LICENSE` for more information.

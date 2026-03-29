@@ -28,6 +28,7 @@ dependencies = []
 Homepage = "https://github.com/FelixBroesamle/s2mflow"
 Repository = "https://github.com/FelixBroesamle/s2mflow"
 Issues = "https://github.com/FelixBroesamle/s2mflow/issues"
+Documentation = "https://s2mflow.readthedocs.io/en/latest"
 
 [build-system]
 requires = ["maturin>=1.0,<2.0"]

@@ -41,5 +41,8 @@ include = ["s2mflow/py.typed"]
 packages = [{ include = "s2mflow" }]
 [dependency-groups]
 dev = [
-    "maturin (>=1.12.6,<2.0.0)"
+    "maturin (>=1.12.6,<2.0.0)",
+    "sphinx (>=9.1.0,<10.0.0)",
+    "sphinx-rtd-theme (>=3.1.0,<4.0.0)",
+    "myst-parser (>=5.0.0,<6.0.0)"
 ]

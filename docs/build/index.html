@@ -1,0 +1,591 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>s2mflow: Multicommodity Flow Instance Generator &mdash; s2mflow 0.1.4 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=fd825880"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="#" class="icon icon-home">
+            s2mflow
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <!-- Local TOC -->
+              <div class="local-toc"><ul>
+<li><a class="reference internal" href="#">s2mflow: Multicommodity Flow Instance Generator</a><ul>
+<li><a class="reference internal" href="#introduction">Introduction</a></li>
+<li><a class="reference internal" href="#api-reference">API Reference</a><ul>
+<li><a class="reference internal" href="#s2mflow.Edge"><code class="docutils literal notranslate"><span class="pre">Edge</span></code></a><ul>
+<li><a class="reference internal" href="#s2mflow.Edge.cost"><code class="docutils literal notranslate"><span class="pre">Edge.cost</span></code></a></li>
+<li><a class="reference internal" href="#s2mflow.Edge.head"><code class="docutils literal notranslate"><span class="pre">Edge.head</span></code></a></li>
+<li><a class="reference internal" href="#s2mflow.Edge.low"><code class="docutils literal notranslate"><span class="pre">Edge.low</span></code></a></li>
+<li><a class="reference internal" href="#s2mflow.Edge.tail"><code class="docutils literal notranslate"><span class="pre">Edge.tail</span></code></a></li>
+<li><a class="reference internal" href="#s2mflow.Edge.up"><code class="docutils literal notranslate"><span class="pre">Edge.up</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#s2mflow.MultiCommodityData"><code class="docutils literal notranslate"><span class="pre">MultiCommodityData</span></code></a><ul>
+<li><a class="reference internal" href="#s2mflow.MultiCommodityData.capacites_by_arc"><code class="docutils literal notranslate"><span class="pre">MultiCommodityData.capacites_by_arc</span></code></a></li>
+<li><a class="reference internal" href="#s2mflow.MultiCommodityData.capacities"><code class="docutils literal notranslate"><span class="pre">MultiCommodityData.capacities</span></code></a></li>
+<li><a class="reference internal" href="#s2mflow.MultiCommodityData.edges"><code class="docutils literal notranslate"><span class="pre">MultiCommodityData.edges</span></code></a></li>
+<li><a class="reference internal" href="#s2mflow.MultiCommodityData.is_uniform"><code class="docutils literal notranslate"><span class="pre">MultiCommodityData.is_uniform</span></code></a></li>
+<li><a class="reference internal" href="#s2mflow.MultiCommodityData.num_commodities"><code class="docutils literal notranslate"><span class="pre">MultiCommodityData.num_commodities</span></code></a></li>
+<li><a class="reference internal" href="#s2mflow.MultiCommodityData.randomized_capacities"><code class="docutils literal notranslate"><span class="pre">MultiCommodityData.randomized_capacities</span></code></a></li>
+<li><a class="reference internal" href="#s2mflow.MultiCommodityData.randomized_weights"><code class="docutils literal notranslate"><span class="pre">MultiCommodityData.randomized_weights</span></code></a></li>
+<li><a class="reference internal" href="#s2mflow.MultiCommodityData.seed"><code class="docutils literal notranslate"><span class="pre">MultiCommodityData.seed</span></code></a></li>
+<li><a class="reference internal" href="#s2mflow.MultiCommodityData.supply_partition"><code class="docutils literal notranslate"><span class="pre">MultiCommodityData.supply_partition</span></code></a></li>
+<li><a class="reference internal" href="#s2mflow.MultiCommodityData.weight"><code class="docutils literal notranslate"><span class="pre">MultiCommodityData.weight</span></code></a></li>
+<li><a class="reference internal" href="#s2mflow.MultiCommodityData.weights_by_arc"><code class="docutils literal notranslate"><span class="pre">MultiCommodityData.weights_by_arc</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#s2mflow.MultiCommoditySupplies"><code class="docutils literal notranslate"><span class="pre">MultiCommoditySupplies</span></code></a><ul>
+<li><a class="reference internal" href="#s2mflow.MultiCommoditySupplies.partition"><code class="docutils literal notranslate"><span class="pre">MultiCommoditySupplies.partition</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#s2mflow.NetworkInstance"><code class="docutils literal notranslate"><span class="pre">NetworkInstance</span></code></a><ul>
+<li><a class="reference internal" href="#s2mflow.NetworkInstance.arcs"><code class="docutils literal notranslate"><span class="pre">NetworkInstance.arcs</span></code></a></li>
+<li><a class="reference internal" href="#s2mflow.NetworkInstance.capacities"><code class="docutils literal notranslate"><span class="pre">NetworkInstance.capacities</span></code></a></li>
+<li><a class="reference internal" href="#s2mflow.NetworkInstance.edges"><code class="docutils literal notranslate"><span class="pre">NetworkInstance.edges</span></code></a></li>
+<li><a class="reference internal" href="#s2mflow.NetworkInstance.nodes"><code class="docutils literal notranslate"><span class="pre">NetworkInstance.nodes</span></code></a></li>
+<li><a class="reference internal" href="#s2mflow.NetworkInstance.num_arcs"><code class="docutils literal notranslate"><span class="pre">NetworkInstance.num_arcs</span></code></a></li>
+<li><a class="reference internal" href="#s2mflow.NetworkInstance.num_nodes"><code class="docutils literal notranslate"><span class="pre">NetworkInstance.num_nodes</span></code></a></li>
+<li><a class="reference internal" href="#s2mflow.NetworkInstance.supplies"><code class="docutils literal notranslate"><span class="pre">NetworkInstance.supplies</span></code></a></li>
+<li><a class="reference internal" href="#s2mflow.NetworkInstance.weights"><code class="docutils literal notranslate"><span class="pre">NetworkInstance.weights</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#s2mflow.ParsedMulticommodityInstance"><code class="docutils literal notranslate"><span class="pre">ParsedMulticommodityInstance</span></code></a><ul>
+<li><a class="reference internal" href="#s2mflow.ParsedMulticommodityInstance.capacities"><code class="docutils literal notranslate"><span class="pre">ParsedMulticommodityInstance.capacities</span></code></a></li>
+<li><a class="reference internal" href="#s2mflow.ParsedMulticommodityInstance.commodity_bundle_capacities"><code class="docutils literal notranslate"><span class="pre">ParsedMulticommodityInstance.commodity_bundle_capacities</span></code></a></li>
+<li><a class="reference internal" href="#s2mflow.ParsedMulticommodityInstance.commodity_capacities"><code class="docutils literal notranslate"><span class="pre">ParsedMulticommodityInstance.commodity_capacities</span></code></a></li>
+<li><a class="reference internal" href="#s2mflow.ParsedMulticommodityInstance.commodity_edges"><code class="docutils literal notranslate"><span class="pre">ParsedMulticommodityInstance.commodity_edges</span></code></a></li>
+<li><a class="reference internal" href="#s2mflow.ParsedMulticommodityInstance.commodity_supply_demand_data"><code class="docutils literal notranslate"><span class="pre">ParsedMulticommodityInstance.commodity_supply_demand_data</span></code></a></li>
+<li><a class="reference internal" href="#s2mflow.ParsedMulticommodityInstance.commodity_weights"><code class="docutils literal notranslate"><span class="pre">ParsedMulticommodityInstance.commodity_weights</span></code></a></li>
+<li><a class="reference internal" href="#s2mflow.ParsedMulticommodityInstance.edges"><code class="docutils literal notranslate"><span class="pre">ParsedMulticommodityInstance.edges</span></code></a></li>
+<li><a class="reference internal" href="#s2mflow.ParsedMulticommodityInstance.end_nodes"><code class="docutils literal notranslate"><span class="pre">ParsedMulticommodityInstance.end_nodes</span></code></a></li>
+<li><a class="reference internal" href="#s2mflow.ParsedMulticommodityInstance.is_uniform"><code class="docutils literal notranslate"><span class="pre">ParsedMulticommodityInstance.is_uniform</span></code></a></li>
+<li><a class="reference internal" href="#s2mflow.ParsedMulticommodityInstance.nodes"><code class="docutils literal notranslate"><span class="pre">ParsedMulticommodityInstance.nodes</span></code></a></li>
+<li><a class="reference internal" href="#s2mflow.ParsedMulticommodityInstance.num_arcs"><code class="docutils literal notranslate"><span class="pre">ParsedMulticommodityInstance.num_arcs</span></code></a></li>
+<li><a class="reference internal" href="#s2mflow.ParsedMulticommodityInstance.num_commodities"><code class="docutils literal notranslate"><span class="pre">ParsedMulticommodityInstance.num_commodities</span></code></a></li>
+<li><a class="reference internal" href="#s2mflow.ParsedMulticommodityInstance.num_nodes"><code class="docutils literal notranslate"><span class="pre">ParsedMulticommodityInstance.num_nodes</span></code></a></li>
+<li><a class="reference internal" href="#s2mflow.ParsedMulticommodityInstance.randomized_capacities"><code class="docutils literal notranslate"><span class="pre">ParsedMulticommodityInstance.randomized_capacities</span></code></a></li>
+<li><a class="reference internal" href="#s2mflow.ParsedMulticommodityInstance.randomized_weights"><code class="docutils literal notranslate"><span class="pre">ParsedMulticommodityInstance.randomized_weights</span></code></a></li>
+<li><a class="reference internal" href="#s2mflow.ParsedMulticommodityInstance.seed"><code class="docutils literal notranslate"><span class="pre">ParsedMulticommodityInstance.seed</span></code></a></li>
+<li><a class="reference internal" href="#s2mflow.ParsedMulticommodityInstance.start_nodes"><code class="docutils literal notranslate"><span class="pre">ParsedMulticommodityInstance.start_nodes</span></code></a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#s2mflow.generate_multi_commodity_data"><code class="docutils literal notranslate"><span class="pre">generate_multi_commodity_data()</span></code></a></li>
+<li><a class="reference internal" href="#s2mflow.get_incidence_mapping"><code class="docutils literal notranslate"><span class="pre">get_incidence_mapping()</span></code></a></li>
+<li><a class="reference internal" href="#s2mflow.load_min_instance"><code class="docutils literal notranslate"><span class="pre">load_min_instance()</span></code></a></li>
+<li><a class="reference internal" href="#s2mflow.load_multi_commodity_instance"><code class="docutils literal notranslate"><span class="pre">load_multi_commodity_instance()</span></code></a></li>
+<li><a class="reference internal" href="#s2mflow.save_multi_commodity_instance"><code class="docutils literal notranslate"><span class="pre">save_multi_commodity_instance()</span></code></a></li>
+<li><a class="reference internal" href="#s2mflow.split_supplies_spread"><code class="docutils literal notranslate"><span class="pre">split_supplies_spread()</span></code></a></li>
+<li><a class="reference internal" href="#s2mflow.split_supplies_uniform"><code class="docutils literal notranslate"><span class="pre">split_supplies_uniform()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+</div>
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">s2mflow</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">s2mflow: Multicommodity Flow Instance Generator</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="s2mflow-multicommodity-flow-instance-generator">
+<h1>s2mflow: Multicommodity Flow Instance Generator<a class="headerlink" href="#s2mflow-multicommodity-flow-instance-generator" title="Link to this heading"></a></h1>
+<p>Welcome to the official documentation for <strong>s2mflow</strong>.
+This library provides a high-performance tool for generating
+multicommodity flow instances from single-commodity flow instances.</p>
+<div class="toctree-wrapper compound">
+</div>
+<section id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Link to this heading"></a></h2>
+<p><cite>s2mflow</cite> bridges the gap between theoretical multicommodity flow research and practical
+optimization by providing a robust generator implemented in Rust with a seamless Python
+interface via PyO3.</p>
+</section>
+<section id="api-reference">
+<h2>API Reference<a class="headerlink" href="#api-reference" title="Link to this heading"></a></h2>
+<p>This section is automatically generated from the source code docstrings.</p>
+<dl class="py class" id="module-s2mflow">
+<dt class="sig sig-object py" id="s2mflow.Edge">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">s2mflow.</span></span><span class="sig-name descname"><span class="pre">Edge</span></span><a class="headerlink" href="#s2mflow.Edge" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="s2mflow.Edge.cost">
+<span class="sig-name descname"><span class="pre">cost</span></span><a class="headerlink" href="#s2mflow.Edge.cost" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="s2mflow.Edge.head">
+<span class="sig-name descname"><span class="pre">head</span></span><a class="headerlink" href="#s2mflow.Edge.head" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="s2mflow.Edge.low">
+<span class="sig-name descname"><span class="pre">low</span></span><a class="headerlink" href="#s2mflow.Edge.low" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="s2mflow.Edge.tail">
+<span class="sig-name descname"><span class="pre">tail</span></span><a class="headerlink" href="#s2mflow.Edge.tail" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="s2mflow.Edge.up">
+<span class="sig-name descname"><span class="pre">up</span></span><a class="headerlink" href="#s2mflow.Edge.up" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="s2mflow.MultiCommodityData">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">s2mflow.</span></span><span class="sig-name descname"><span class="pre">MultiCommodityData</span></span><a class="headerlink" href="#s2mflow.MultiCommodityData" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="s2mflow.MultiCommodityData.capacites_by_arc">
+<span class="sig-name descname"><span class="pre">capacites_by_arc</span></span><a class="headerlink" href="#s2mflow.MultiCommodityData.capacites_by_arc" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="s2mflow.MultiCommodityData.capacities">
+<span class="sig-name descname"><span class="pre">capacities</span></span><a class="headerlink" href="#s2mflow.MultiCommodityData.capacities" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="s2mflow.MultiCommodityData.edges">
+<span class="sig-name descname"><span class="pre">edges</span></span><a class="headerlink" href="#s2mflow.MultiCommodityData.edges" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="s2mflow.MultiCommodityData.is_uniform">
+<span class="sig-name descname"><span class="pre">is_uniform</span></span><a class="headerlink" href="#s2mflow.MultiCommodityData.is_uniform" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="s2mflow.MultiCommodityData.num_commodities">
+<span class="sig-name descname"><span class="pre">num_commodities</span></span><a class="headerlink" href="#s2mflow.MultiCommodityData.num_commodities" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="s2mflow.MultiCommodityData.randomized_capacities">
+<span class="sig-name descname"><span class="pre">randomized_capacities</span></span><a class="headerlink" href="#s2mflow.MultiCommodityData.randomized_capacities" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="s2mflow.MultiCommodityData.randomized_weights">
+<span class="sig-name descname"><span class="pre">randomized_weights</span></span><a class="headerlink" href="#s2mflow.MultiCommodityData.randomized_weights" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="s2mflow.MultiCommodityData.seed">
+<span class="sig-name descname"><span class="pre">seed</span></span><a class="headerlink" href="#s2mflow.MultiCommodityData.seed" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="s2mflow.MultiCommodityData.supply_partition">
+<span class="sig-name descname"><span class="pre">supply_partition</span></span><a class="headerlink" href="#s2mflow.MultiCommodityData.supply_partition" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="s2mflow.MultiCommodityData.weight">
+<span class="sig-name descname"><span class="pre">weight</span></span><a class="headerlink" href="#s2mflow.MultiCommodityData.weight" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="s2mflow.MultiCommodityData.weights_by_arc">
+<span class="sig-name descname"><span class="pre">weights_by_arc</span></span><a class="headerlink" href="#s2mflow.MultiCommodityData.weights_by_arc" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="s2mflow.MultiCommoditySupplies">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">s2mflow.</span></span><span class="sig-name descname"><span class="pre">MultiCommoditySupplies</span></span><a class="headerlink" href="#s2mflow.MultiCommoditySupplies" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="s2mflow.MultiCommoditySupplies.partition">
+<span class="sig-name descname"><span class="pre">partition</span></span><a class="headerlink" href="#s2mflow.MultiCommoditySupplies.partition" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="s2mflow.NetworkInstance">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">s2mflow.</span></span><span class="sig-name descname"><span class="pre">NetworkInstance</span></span><a class="headerlink" href="#s2mflow.NetworkInstance" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="s2mflow.NetworkInstance.arcs">
+<span class="sig-name descname"><span class="pre">arcs</span></span><a class="headerlink" href="#s2mflow.NetworkInstance.arcs" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="s2mflow.NetworkInstance.capacities">
+<span class="sig-name descname"><span class="pre">capacities</span></span><a class="headerlink" href="#s2mflow.NetworkInstance.capacities" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="s2mflow.NetworkInstance.edges">
+<span class="sig-name descname"><span class="pre">edges</span></span><a class="headerlink" href="#s2mflow.NetworkInstance.edges" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="s2mflow.NetworkInstance.nodes">
+<span class="sig-name descname"><span class="pre">nodes</span></span><a class="headerlink" href="#s2mflow.NetworkInstance.nodes" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="s2mflow.NetworkInstance.num_arcs">
+<span class="sig-name descname"><span class="pre">num_arcs</span></span><a class="headerlink" href="#s2mflow.NetworkInstance.num_arcs" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="s2mflow.NetworkInstance.num_nodes">
+<span class="sig-name descname"><span class="pre">num_nodes</span></span><a class="headerlink" href="#s2mflow.NetworkInstance.num_nodes" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="s2mflow.NetworkInstance.supplies">
+<span class="sig-name descname"><span class="pre">supplies</span></span><a class="headerlink" href="#s2mflow.NetworkInstance.supplies" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="s2mflow.NetworkInstance.weights">
+<span class="sig-name descname"><span class="pre">weights</span></span><a class="headerlink" href="#s2mflow.NetworkInstance.weights" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="s2mflow.ParsedMulticommodityInstance">
+<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">s2mflow.</span></span><span class="sig-name descname"><span class="pre">ParsedMulticommodityInstance</span></span><a class="headerlink" href="#s2mflow.ParsedMulticommodityInstance" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="s2mflow.ParsedMulticommodityInstance.capacities">
+<span class="sig-name descname"><span class="pre">capacities</span></span><a class="headerlink" href="#s2mflow.ParsedMulticommodityInstance.capacities" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="s2mflow.ParsedMulticommodityInstance.commodity_bundle_capacities">
+<span class="sig-name descname"><span class="pre">commodity_bundle_capacities</span></span><a class="headerlink" href="#s2mflow.ParsedMulticommodityInstance.commodity_bundle_capacities" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="s2mflow.ParsedMulticommodityInstance.commodity_capacities">
+<span class="sig-name descname"><span class="pre">commodity_capacities</span></span><a class="headerlink" href="#s2mflow.ParsedMulticommodityInstance.commodity_capacities" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="s2mflow.ParsedMulticommodityInstance.commodity_edges">
+<span class="sig-name descname"><span class="pre">commodity_edges</span></span><a class="headerlink" href="#s2mflow.ParsedMulticommodityInstance.commodity_edges" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="s2mflow.ParsedMulticommodityInstance.commodity_supply_demand_data">
+<span class="sig-name descname"><span class="pre">commodity_supply_demand_data</span></span><a class="headerlink" href="#s2mflow.ParsedMulticommodityInstance.commodity_supply_demand_data" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="s2mflow.ParsedMulticommodityInstance.commodity_weights">
+<span class="sig-name descname"><span class="pre">commodity_weights</span></span><a class="headerlink" href="#s2mflow.ParsedMulticommodityInstance.commodity_weights" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="s2mflow.ParsedMulticommodityInstance.edges">
+<span class="sig-name descname"><span class="pre">edges</span></span><a class="headerlink" href="#s2mflow.ParsedMulticommodityInstance.edges" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="s2mflow.ParsedMulticommodityInstance.end_nodes">
+<span class="sig-name descname"><span class="pre">end_nodes</span></span><a class="headerlink" href="#s2mflow.ParsedMulticommodityInstance.end_nodes" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="s2mflow.ParsedMulticommodityInstance.is_uniform">
+<span class="sig-name descname"><span class="pre">is_uniform</span></span><a class="headerlink" href="#s2mflow.ParsedMulticommodityInstance.is_uniform" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="s2mflow.ParsedMulticommodityInstance.nodes">
+<span class="sig-name descname"><span class="pre">nodes</span></span><a class="headerlink" href="#s2mflow.ParsedMulticommodityInstance.nodes" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="s2mflow.ParsedMulticommodityInstance.num_arcs">
+<span class="sig-name descname"><span class="pre">num_arcs</span></span><a class="headerlink" href="#s2mflow.ParsedMulticommodityInstance.num_arcs" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="s2mflow.ParsedMulticommodityInstance.num_commodities">
+<span class="sig-name descname"><span class="pre">num_commodities</span></span><a class="headerlink" href="#s2mflow.ParsedMulticommodityInstance.num_commodities" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="s2mflow.ParsedMulticommodityInstance.num_nodes">
+<span class="sig-name descname"><span class="pre">num_nodes</span></span><a class="headerlink" href="#s2mflow.ParsedMulticommodityInstance.num_nodes" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="s2mflow.ParsedMulticommodityInstance.randomized_capacities">
+<span class="sig-name descname"><span class="pre">randomized_capacities</span></span><a class="headerlink" href="#s2mflow.ParsedMulticommodityInstance.randomized_capacities" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="s2mflow.ParsedMulticommodityInstance.randomized_weights">
+<span class="sig-name descname"><span class="pre">randomized_weights</span></span><a class="headerlink" href="#s2mflow.ParsedMulticommodityInstance.randomized_weights" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="s2mflow.ParsedMulticommodityInstance.seed">
+<span class="sig-name descname"><span class="pre">seed</span></span><a class="headerlink" href="#s2mflow.ParsedMulticommodityInstance.seed" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="s2mflow.ParsedMulticommodityInstance.start_nodes">
+<span class="sig-name descname"><span class="pre">start_nodes</span></span><a class="headerlink" href="#s2mflow.ParsedMulticommodityInstance.start_nodes" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="s2mflow.generate_multi_commodity_data">
+<span class="sig-prename descclassname"><span class="pre">s2mflow.</span></span><span class="sig-name descname"><span class="pre">generate_multi_commodity_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_commodities</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_uniform</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">randomize_caps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cap_a</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cap_b</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">randomize_costs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cost_a</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cost_b</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">42</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#s2mflow.generate_multi_commodity_data" title="Link to this definition"></a></dt>
+<dd><p>Generates a full multi-commodity dataset from a single-commodity instance.</p>
+<p>This function handles the partitioning of supplies and the optional randomization of
+arc capacities and costs across commodities.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>instance</strong> (<a class="reference internal" href="#s2mflow.NetworkInstance" title="s2mflow.NetworkInstance"><em>NetworkInstance</em></a>) – The base single-commodity network.</p></li>
+<li><p><strong>num_commodities</strong> (<em>int</em>) – The number of commodities.</p></li>
+<li><p><strong>is_uniform</strong> (<em>bool</em>) – If Ture, uses uniform partitioning; otherwise, uses spread.</p></li>
+<li><p><strong>randomize_caps</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, varies capacities per commodity. Default to False.</p></li>
+<li><p><strong>cap_a</strong> (<em>float</em><em>, </em><em>optional</em>) – Lower multiplier for capacity randomization. Defaults to 0.8.</p></li>
+<li><p><strong>cap_b</strong> (<em>float</em><em>, </em><em>optional</em>) – Upper multiplier for capacity randomization. Defaults to 1.2.</p></li>
+<li><p><strong>randomize_costs</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, varies costs per commodity. Defaults to False.</p></li>
+<li><p><strong>cost_a</strong> (<em>float</em><em>, </em><em>optional</em>) – Lower multiplier for cost randomization. Defaults to 0.8.</p></li>
+<li><p><strong>cost_b</strong> (<em>float</em><em>, </em><em>optional</em>) – Upper multiplier for cost randomization. defaults to 1.2.</p></li>
+<li><p><strong>seed</strong> (<em>int</em><em>, </em><em>optional</em>) – Seed.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The generated multi-commodity data.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#s2mflow.MultiCommodityData" title="s2mflow.MultiCommodityData">MultiCommodityData</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="s2mflow.get_incidence_mapping">
+<span class="sig-prename descclassname"><span class="pre">s2mflow.</span></span><span class="sig-name descname"><span class="pre">get_incidence_mapping</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nodes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edges</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#s2mflow.get_incidence_mapping" title="Link to this definition"></a></dt>
+<dd><p>Creates indidence mapping from nodes and edges.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nodes</strong> (<em>List</em><em>[</em><em>int</em><em>]</em>) – List of node IDs.</p></li>
+<li><p><strong>edges</strong> (<em>List</em><em>[</em><em>int</em><em>, </em><em>int</em><em>]</em>) – List of edges.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Incoming and outgoing.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tuple[Dict[int, List[int]], Dict[int, List[int]]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="s2mflow.load_min_instance">
+<span class="sig-prename descclassname"><span class="pre">s2mflow.</span></span><span class="sig-name descname"><span class="pre">load_min_instance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#s2mflow.load_min_instance" title="Link to this definition"></a></dt>
+<dd><p>Loads a single-commodity network instance from a DIMACS .min file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>path</strong> (<em>str</em>) – The filesystem path to the .min file.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>An object containing information on the min-cost flow instance.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#s2mflow.NetworkInstance" title="s2mflow.NetworkInstance">NetworkInstance</a></p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>IOError</strong> – If the file cannot be read or the format is invalid.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="s2mflow.load_multi_commodity_instance">
+<span class="sig-prename descclassname"><span class="pre">s2mflow.</span></span><span class="sig-name descname"><span class="pre">load_multi_commodity_instance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#s2mflow.load_multi_commodity_instance" title="Link to this definition"></a></dt>
+<dd><p>Loads and parses a multi-commodity DIMACS file into a multicommodity-instance.</p>
+<p>This function reads the specialized DIMACS format generated by this package.
+It reconstructs the multicommodity instance.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>path</strong> (<em>str</em>) – The filesystem path to the multi-commodity .min file.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>An object containing multi-commodity data.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#s2mflow.ParsedMulticommodityInstance" title="s2mflow.ParsedMulticommodityInstance">ParsedMulticommodityInstance</a></p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>RuntimeError</strong> – If the file header is inconsistent or the arc data is malformed.</p></li>
+<li><p><strong>IOError</strong> – If the file cannot be accessed.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="s2mflow.save_multi_commodity_instance">
+<span class="sig-prename descclassname"><span class="pre">s2mflow.</span></span><span class="sig-name descname"><span class="pre">save_multi_commodity_instance</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">multi_data</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#s2mflow.save_multi_commodity_instance" title="Link to this definition"></a></dt>
+<dd><p>Exports a multi-commodity instance to a DIMACS-formatted file.</p>
+<p>Uses a specialized hybrid format that compresses non-randomized arc data while allowing
+expanded per-commodity values when necessary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<em>str</em>) – Export destination path.</p></li>
+<li><p><strong>instance</strong> (<a class="reference internal" href="#s2mflow.NetworkInstance" title="s2mflow.NetworkInstance"><em>NetworkInstance</em></a>) – The base network topology.</p></li>
+<li><p><strong>multi_data</strong> (<a class="reference internal" href="#s2mflow.MultiCommodityData" title="s2mflow.MultiCommodityData"><em>MultiCommodityData</em></a>) – The multi-commodity data.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="s2mflow.split_supplies_spread">
+<span class="sig-prename descclassname"><span class="pre">s2mflow.</span></span><span class="sig-name descname"><span class="pre">split_supplies_spread</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#s2mflow.split_supplies_spread" title="Link to this definition"></a></dt>
+<dd><p>Partitions nodal supply/demand into K commodities using a spread distribution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>Dict</em><em>[</em><em>int</em><em>, </em><em>int</em><em>]</em>) – A mapping of node IDs to their total supply/demand.</p></li>
+<li><p><strong>num_k</strong> (<em>int</em>) – The number of commodities.</p></li>
+<li><p><strong>seed</strong> (<em>int</em>) – Seed.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A mapping where each node ID points to a list of the commodity supplies/demands.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dict[int, List[int]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="s2mflow.split_supplies_uniform">
+<span class="sig-prename descclassname"><span class="pre">s2mflow.</span></span><span class="sig-name descname"><span class="pre">split_supplies_uniform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_k</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#s2mflow.split_supplies_uniform" title="Link to this definition"></a></dt>
+<dd><p>Partitions nodal supply/demand into K commodities using a uniform distribution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data</strong> (<em>Dict</em><em>[</em><em>int</em><em>, </em><em>int</em><em>]</em>) – A mapping of node IDs to their total supply/demand.</p></li>
+<li><p><strong>num_k</strong> (<em>int</em>) – The number of commodities.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A mapping where each node ID points to a list of the commodity supplies/demands</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dict[int, List[int]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+<section id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Link to this heading"></a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Felix P. Broesamle, Stefan Nickel.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

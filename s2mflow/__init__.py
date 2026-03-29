@@ -27,3 +27,5 @@ __all__ = [
     "MultiCommodityData",
     "ParsedMulticommodityInstance"
 ]
+
+from .s2mflow import __doc__

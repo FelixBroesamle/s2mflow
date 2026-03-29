@@ -1,3 +1,4 @@
 maturin>=1.0,<2.0
+sphinx>=9.1.0,<10.0.0
 sphinx-rtd-theme
 myst-parser

@@ -5,14 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this
 
-## [0.1.2] - 2026-03-29
+## [0.1.3] - 2026-03-29
+### Fixed
+- Corrected "MIT License" typo in `README.md`.
 
+## [0.1.2] - 2026-03-29
 ### Fixed
 - Refined definitions for `uniform` and `spread` partitioning logic.
 - Corrected `README.md`.
 
 ## [0.1.1] - 2026-03-29
-
 ### Fixed
 - Updated license information.
 - Fixed minors in `README.md`.
@@ -20,7 +22,6 @@ and this
 ## [Unreleased]
 
 ## [0.1.0] - 2026-03-28
-
 ### Added
 - **Core Rust Engine**: Implementation for multicommodity flow instance generation.
 - **Python Bindings**: Integration using PyO3 and Maturin.

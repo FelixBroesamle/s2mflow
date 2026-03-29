@@ -1,6 +1,6 @@
 [project]
 name = "s2mflow"
-version = "0.1.2"
+version = "0.1.3"
 description = "Meta-generator: generating multicommodity flow instances from single-commodity flow instances."
 authors = [
     {name = "Felix P. Broesamle",email = "felix.broesamle@kit.edu"},

@@ -88,4 +88,4 @@ If you use `s2mflow` in your research, please cite the software:
 
 ## License
 
-Distributed under the MIT lIcense. See `LICENSE` for more information.
+Distributed under the MIT License. See `LICENSE` for more information.

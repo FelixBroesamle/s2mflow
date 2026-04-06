@@ -1,19 +1,38 @@
 # s2mflow
 
-**A meta-generator for generating multicommodity flow instances from single-commodity flow instances.**
+**A high-performance meta-generation framework for lifting single-commodity flow instances into the multicommodity space.**
 
-`s2mflow` is a Python library with a high-speed Rust core (via PyO3) designed to transform single-commodity minimum-cost flow (MCF) instances into minimum-cost multicommodity flow (MCMCF) instances. It is built for researchers in Operations Research, Mathematical Optimization, and Network Optimization who need to generate reproducible, scalable test data.
+`s2mflow` is a Python library [PyPI](https://pypi.org/project/s2mflow/) with a high-speed Rust core (via PyO3) designed to transform single-commodity minimum-cost flow (MCF) instances into minimum-cost multicommodity flow (MCMCF) instances. It is built for researchers in Operations Research, Mathematical Optimization, and Network Optimization who need to generate reproducible, scalable test data.
+
+`s2mflow` implements and extends the meta-generation framework introduced in:
+```text
+Felix P. Broesamle and Stefan Nickel. 2026. "On the Single-Multi-Commodity Gap: Lifting Single- to Multicommodity Flow Instances". Preprint, Optimization Online.
+```
 
 ## Key Features
 
-- **Blazing Fast**: Core logic implemented in Rust for zero-overhead data handling.
+- **High Performance**: Core logic implemented in Rust for zero-overhead data handling.
 - **DIMACS Compatible**: Load standard `.min` single-commodity files.
-- **Custom MCMCF Format**: Introduces the `.mcfmin` format for multicommodity data.
-- **Supply Partitioning**:
+- **Custom MCMCF Format**: Introduces the `.mcfmin` format for standardize multicommodity data storage.
+- **Supply Partitioning Methods**:
     - `uniform`: Equal distribution of supply and demand across commodities.
     - `spread`: Randomized, heterogeneous distribution of supply and demand across commodities.
-- **Randomizing Capacities and Costs**: Functionality for generating randomized commodity capacities and commodity costs for each arc.
+- **Randomizing Capacities and Costs**: Functionality for generating randomized commodity-specific capacities and costs for each arc.
 - **Network Utilities**: Support for identifying incoming and outgoing edges.
+
+## The Extended `.mcfmin` Format
+
+The library uses a natural extension of the DIMACS `.min` format to support multiple commodities:
+
+- **Problem Line**: `p min <num_nodes: int> <num_edges: int> <num_commodities: int> <randomize_caps: bool> <randomize_costs: bool> <is_uniform: bool> <seed: int = 0>`.
+    - `seed`: relevant if `is_uniform = 1` (Spread method) or if randomization of commodity-specific capacities or costs is enabled (`randomize_caps = 1` or `randomize_costs = 1`).
+- **Node Line**: `n <node_id: int> <total_demand: int> <demand_com_1: int> <demand_com_2: int> ... <demand_com_K: int>`
+- **Arc Line**: Depending on the randomization flags `(randomize_caps, randomize_costs)`:
+    - Default `(0, 0)`: `a <from> <to> <low> <cap_total> <cap_total> <cost>`.
+    - Commodity-specific capacities `(1, 0)`: `a <from> <to> <low> <cap_total> <cap_1> ... <cap_K> <cost>`.
+    - Commodity-sepcific costs `(0, 1)`: `a <from> <to> <low> <cap_total> <cap_total> <cost_1> ... <cost_K>`.
+    - Commodity-specific capacities and costs `(1, 1)`: `a <from> <to> <low> <cap_total> <cap_1> ... <cap_K> <cost_1> ... <cost_K>`.
+
 
 ## Installation
 
@@ -75,7 +94,19 @@ s2mflow.save_multi_commodity_instance("output.mcfmin", network, mc_data)
 
 ## Citing
 
-If you use `s2mflow` in your research, please cite the software:
+If you use `s2mflow` in your research, please use the following preferred citation for the framework:
+```text
+@misc{BroesamleNickel:SMCG,
+    author = {Broesamle, Felix P. and Nickel, Stefan},
+    title = {On the Single-Multi-Commodity Gap: Lifting Single- to Multicommodity Flow Instances},
+    year = {2026},
+    howpublished = {Preprint, Optimization Online},
+    url = {https://optimization-online.org/?p=34287},
+    note = {Available at \url{https://optimization-online.org/?p=34287}},
+}
+```
+
+To cite `s2mflow` specifically in your research, please cite the software:
 ```text
 @software{s2mflow2026,
   author = {Broesamle, Felix P. and Nickel, Stefan},

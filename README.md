@@ -6,7 +6,7 @@
 
 `s2mflow` implements and extends the meta-generation framework introduced in:
 ```text
-Felix P. Broesamle and Stefan Nickel. 2026. "On the Single-Multi-Commodity Gap: Lifting Single- to Multicommodity Flow Instances". Preprint, Optimization Online.
+Felix P. Broesamle and Stefan Nickel. 2026. "On the Single-Multi-Commodity Gap: Lifting Single- to Multicommodity Flow Instances". Optimization Online. Preprint. Available at [https://optimization-online.org/?p=34287](https://optimization-online.org/?p=34287).
 ```
 
 ## Key Features

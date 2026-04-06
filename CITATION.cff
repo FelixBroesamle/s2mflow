@@ -12,7 +12,7 @@ date-released: 2026-03-28
 url: "https://github.com/FelixBroesamle/s2mflow"
 
 preferred-citation:
-  type: generic
+  type: article
   authors:
     - family-names: "Broesamle"
       given-names: "Felix P."
@@ -22,7 +22,5 @@ preferred-citation:
       affiliation: "Discrete Optimization and Logistics, Institute for Operations Research, Karlsruhe Institute of Technology"
   title: "On the Single-Multi-Commodity Gap: Lifting Single- to Multicommodity Flow Instances"
   year: 2026
-  medium: "Preprint"
-  publisher:
-    name: "Optimization Online"
+  journal: "Optimization Online (Preprint)"
   url: "https://optimization-online.org/?p=34287"

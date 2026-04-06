@@ -13,7 +13,7 @@ Felix P. Broesamle and Stefan Nickel. 2026. "On the Single-Multi-Commodity Gap: 
 
 - **High Performance**: Core logic implemented in Rust for zero-overhead data handling.
 - **DIMACS Compatible**: Load standard `.min` single-commodity files.
-- **Custom MCMCF Format**: Introduces the `.mcfmin` format for standardize multicommodity data storage.
+- **Custom MCMCF Format**: Introduces the `.mcfmin` format for standardized multicommodity data storage.
 - **Supply Partitioning Methods**:
     - `uniform`: Equal distribution of supply and demand across commodities.
     - `spread`: Randomized, heterogeneous distribution of supply and demand across commodities.
@@ -24,13 +24,13 @@ Felix P. Broesamle and Stefan Nickel. 2026. "On the Single-Multi-Commodity Gap: 
 
 The library uses a natural extension of the DIMACS `.min` format to support multiple commodities:
 
-- **Problem Line**: `p min <num_nodes: int> <num_edges: int> <num_commodities: int> <randomize_caps: bool> <randomize_costs: bool> <is_uniform: bool> <seed: int = 0>`.
-    - `seed`: relevant if `is_uniform = 1` (Spread method) or if randomization of commodity-specific capacities or costs is enabled (`randomize_caps = 1` or `randomize_costs = 1`).
-- **Node Line**: `n <node_id: int> <total_demand: int> <demand_com_1: int> <demand_com_2: int> ... <demand_com_K: int>`
+- **Problem Line**: `p min <num_nodes> <num_edges> <num_commodities> <randomize_caps> <randomize_costs> <is_uniform> <seed = 0>`.
+    - `seed`: relevant if `is_uniform = 0` (Spread method) or if randomization of commodity-specific capacities or costs is enabled (`randomize_caps = 1` or `randomize_costs = 1`).
+- **Node Line**: `n <node_id> <total_demand> <demand_com_1> <demand_com_2> ... <demand_com_K>`.
 - **Arc Line**: Depending on the randomization flags `(randomize_caps, randomize_costs)`:
     - Default `(0, 0)`: `a <from> <to> <low> <cap_total> <cap_total> <cost>`.
     - Commodity-specific capacities `(1, 0)`: `a <from> <to> <low> <cap_total> <cap_1> ... <cap_K> <cost>`.
-    - Commodity-sepcific costs `(0, 1)`: `a <from> <to> <low> <cap_total> <cap_total> <cost_1> ... <cost_K>`.
+    - Commodity-specific costs `(0, 1)`: `a <from> <to> <low> <cap_total> <cap_total> <cost_1> ... <cost_K>`.
     - Commodity-specific capacities and costs `(1, 1)`: `a <from> <to> <low> <cap_total> <cap_1> ... <cap_K> <cost_1> ... <cost_K>`.
 
 
@@ -100,9 +100,9 @@ If you use `s2mflow` in your research, please use the following preferred citati
     author = {Broesamle, Felix P. and Nickel, Stefan},
     title = {On the Single-Multi-Commodity Gap: Lifting Single- to Multicommodity Flow Instances},
     year = {2026},
-    howpublished = {Preprint, Optimization Online},
+    howpublished = {Optimization Online},
+    note = {Preprint. Available at \url{https://optimization-online.org/?p=34287}},
     url = {https://optimization-online.org/?p=34287},
-    note = {Available at \url{https://optimization-online.org/?p=34287}},
 }
 ```
 

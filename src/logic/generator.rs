@@ -236,3 +236,103 @@ pub fn generate_multi_commodity_data(
     }
 
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::collections::BTreeMap;
+
+    /// Test Phase 1: Local Partitioning (Node-wise Split)
+    /// Goal: Ensure the sum of partitioned commodities at a node matches the original node supply.
+    #[test]
+    fn test_local_partitioning() {
+        let mut supplies = BTreeMap::new();
+        supplies.insert(1, 10);
+        supplies.insert(2, -10);
+
+        let num_commodities = 3;
+        
+        // Test Uniform
+        let res_uniform = split_supply_and_demand_uniform(&supplies, num_commodities);
+
+        for (&node, &original_val) in &supplies {
+            let partition = &res_uniform[&node];
+
+            // Check Sum
+            let partition_sum: i32 = partition.iter().sum();
+            assert_eq!(partition_sum, original_val, "Uniform split sum mismatch at node {}", node);
+
+            // Check Sign Consistency
+            for &val in partition {
+                if original_val > 0 {
+                    assert!(val >= 0, "Node {} is supply (>0) but has negative commodity value {}", node, val);
+                } else if original_val < 0 {
+                    assert!(val <= 0, "Node {} is demand (<0) but has positive commodity value {}", node, val);
+                }
+            }
+        }
+
+        // Test Spread
+        let res_spread = split_supply_and_demand_spread(&supplies, num_commodities, 42);
+        for (&node, &original_val) in &supplies {
+            let partition = &res_spread[&node];
+            
+            // Check sum
+            let partition_sum: i32 = partition.iter().sum();
+            assert_eq!(partition_sum, original_val, "Spread split sum mismatch at node {}", node);
+
+            // Check Sign Consistency
+            for &val in partition {
+                if original_val > 0 {
+                    assert!(val >= 0, "Node {} is supply (>0) but has negative commodity value {}", node, val);
+                } else if original_val < 0 {
+                    assert!(val <= 0, "Node {} is demand (<0) but has positive commodity value {}", node, val);
+                }
+            }
+
+        }
+    }
+
+    /// Test Phase 2: Global Balancing (Commodity-wise Zero Sum)
+    /// Goal: Ensure that after balancing, the sum of a specific commodity across all nodes is 0.
+    #[test]
+    fn test_balance_commodities() {
+        let mut commodity_data = BTreeMap::new();
+        commodity_data.insert(1, vec![3, 8, 2]);
+        commodity_data.insert(2, vec![0, 1, 1]);
+        commodity_data.insert(3, vec![2, 0, 3]);
+        commodity_data.insert(4, vec![-1, -4, -1]);
+        commodity_data.insert(5, vec![-2, -9, -3]);
+
+        let original_data = BTreeMap::from([(1, 13), (2, 2), (3, 5), (4, -6), (5, -14)]);
+        let num_commodities = 3;
+
+        balance_commodities(&mut commodity_data, &original_data, num_commodities);
+
+        // Verify Global Balance: sum_i(b_i^k) == 0
+        for k in 0..num_commodities {
+            let global_sum: i32 = commodity_data.values().map(|v| v[k]).sum();
+            assert_eq!(global_sum, 0, "Global balance failed for commodity {}", k);
+        }
+
+        // Re-verify Local  Balance (sum_k(b_i^k) == b_i) and Sign Consistency
+        for (&node, &original_val) in &original_data {
+            let partition = &commodity_data[&node];
+
+            // Local Sum
+            let local_sum: i32 = partition.iter().sum();
+            assert_eq!(local_sum, original_val, "Local balance failed at node {} after global balancing", node);
+
+            // Sign Consistency (Post-Balancing)
+            for &val in partition {
+                if original_val > 0 {
+                    assert!(val >= 0, "Balancing pushed node {} (supply) to negative value {}", node, val);
+                } else if original_val < 0 {
+                    assert!(val <= 0, "Balanving pushed node {} (demand) to positive value {}", node, val);
+                }
+            }
+        }
+
+    }
+
+}

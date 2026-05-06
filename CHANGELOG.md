@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this
 
+## [0.1.7] - 2026-05-06
+### Added
+- Added basic tests.
+
 ## [0.1.7] - 2026-04-06
 ### Changed
 - Adjusted `README.md` and citation.

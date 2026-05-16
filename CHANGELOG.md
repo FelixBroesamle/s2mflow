@@ -5,7 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this
 
-## [0.1.7] - 2026-05-06
+## [0.1.9] - 2026-05-16
+### Added
+- Upgraded to **Rust Edition 2024**.
+
+### Fixed
+- Inside `.github/workflows/release.yml`: directory tracking path masks (`dist/*.whl` and `dist/*.tar.gz`).
+
+## [0.1.8] - 2026-05-06
 ### Added
 - Added basic tests.
 

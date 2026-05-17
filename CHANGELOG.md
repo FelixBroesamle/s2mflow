@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this
 
+## [0.1.10] - 2026-05-17
+### Fixed
+- `src/utils.rs`: fixed bug inside the multicommodity parser.
+
 ## [0.1.9] - 2026-05-16
 ### Added
 - Upgraded to **Rust Edition 2024**.

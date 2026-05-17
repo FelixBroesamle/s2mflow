@@ -154,6 +154,7 @@ pub fn parse_multi_min(path: &str) -> Result<ParsedMulticommodityInstance, Box<d
 
                 let parsed_caps: Vec<i64> = if rand_caps {
                     let res = tokens[current_idx..(current_idx + k)].iter().map(|&t| t.parse::<i64>()).collect::<Result<Vec<_>, _>>()?;
+                    current_idx += k;
                     res
                 } else {
                     let val = tokens[current_idx].parse::<i64>()?;

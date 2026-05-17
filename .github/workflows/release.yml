@@ -30,6 +30,12 @@ jobs:
           target: ${{ matrix.target }}
           args: --release --out dist
           manylinux: auto
+          before-script-linux: |
+            if command -v apt-get &> /dev/null; then
+                apt-get update && apt-get install -y python3 python3-pip
+            elif command -v yum &> /dev/null; then
+                yum install -y python3 python3-pip
+            fi
 
       - name: Upload wheels
         uses: actions/upload-artifact@v4

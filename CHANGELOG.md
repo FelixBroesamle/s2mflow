@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this
 
+## [0.1.12] - 2026-05-18
+### Added
+- Added testing infrastructure for multicommodity data generation (`test_partition_logic`).
+- Added end-to-end file round-trip test (`test_round_trip`).
+
 ## [0.1.11] - 2026-05-17
 ### Fixed
 - Fixed CI.

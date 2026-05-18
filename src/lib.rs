@@ -21,7 +21,7 @@ use crate::models::{MultiCommodityData, NetworkInstance};
 /// Raises:
 ///     IOError: If the file cannot be read or the format is invalid.
 #[pyfunction]
-fn load_min_instance(
+pub fn load_min_instance(
     path: String
 ) -> PyResult<models::NetworkInstance> {
     utils::parse_min(&path).map_err(|e| PyErr::new::<pyo3::exceptions::PyIOError, _>(e.to_string()))
@@ -37,10 +37,10 @@ fn load_min_instance(
 ///     Dict[int, List[int]]: A mapping where each node ID points to a list of the commodity supplies/demands
 #[pyfunction]
 #[pyo3(signature = (data, num_k))]
-fn split_supplies_uniform(
-    data: BTreeMap<i32, i32>, 
+pub fn split_supplies_uniform(
+    data: BTreeMap<i64, i64>, 
     num_k: usize
-) -> BTreeMap<i32, Vec<i32>> {
+) -> BTreeMap<i64, Vec<i64>> {
     logic::generator::split_supply_and_demand_uniform(
         &data, 
         num_k
@@ -58,11 +58,11 @@ fn split_supplies_uniform(
 ///     Dict[int, List[int]]: A mapping where each node ID points to a list of the commodity supplies/demands.
 #[pyfunction]
 #[pyo3(signature = (data, num_k, seed))]
-fn split_supplies_spread(
-    data: BTreeMap<i32, i32>,
+pub fn split_supplies_spread(
+    data: BTreeMap<i64, i64>,
     num_k: usize,
     seed: u64,
-) -> BTreeMap<i32, Vec<i32>> {
+) -> BTreeMap<i64, Vec<i64>> {
     logic::generator::split_supply_and_demand_spread(
         &data, 
         num_k,
@@ -102,7 +102,7 @@ fn split_supplies_spread(
     cost_b=1.2,
     seed=42,
 ))]
-fn generate_multi_commodity_data(
+pub fn generate_multi_commodity_data(
     instance: &models::NetworkInstance, 
     num_commodities: usize, 
     is_uniform: bool,
@@ -139,7 +139,7 @@ fn generate_multi_commodity_data(
 ///     multi_data (MultiCommodityData): The multi-commodity data.
 /// 
 #[pyfunction]
-fn save_multi_commodity_instance(
+pub fn save_multi_commodity_instance(
     path: String,
     instance: &NetworkInstance,
     multi_data: &MultiCommodityData,
@@ -168,7 +168,7 @@ fn save_multi_commodity_instance(
 ///     RuntimeError: If the file header is inconsistent or the arc data is malformed.
 ///     IOError: If the file cannot be accessed.
 #[pyfunction]
-fn load_multi_commodity_instance(
+pub fn load_multi_commodity_instance(
     path: String
 ) -> PyResult<models::ParsedMulticommodityInstance> {
     utils::parse_multi_min(
@@ -188,10 +188,10 @@ fn load_multi_commodity_instance(
 ///     Tuple[Dict[int, List[int]], Dict[int, List[int]]]: Incoming and outgoing.
 #[pyfunction]
 #[pyo3(signature = (nodes, edges))]
-fn get_incidence_mapping(
-    nodes: Vec<i32>,
-    edges: Vec<(i32, i32)>
-) -> (BTreeMap<i32, Vec<i32>>, BTreeMap<i32, Vec<i32>>) {
+pub fn get_incidence_mapping(
+    nodes: Vec<i64>,
+    edges: Vec<(i64, i64)>
+) -> (BTreeMap<i64, Vec<i64>>, BTreeMap<i64, Vec<i64>>) {
     crate::utils::get_incidence_mapping(
         nodes, 
         edges
@@ -199,7 +199,7 @@ fn get_incidence_mapping(
 }
 
 #[pymodule]
-fn s2mflow(
+pub fn s2mflow(
     _py: Python, 
     m: &Bound<'_, PyModule>
 ) -> PyResult<()> {

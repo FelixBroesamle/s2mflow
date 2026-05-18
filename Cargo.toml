@@ -6,7 +6,7 @@ description = "Meta-generator: generating multicommodity flow instances from sin
 
 [lib]
 name = "s2mflow"
-crate-type = ["cdylib"]
+crate-type = ["cdylib", "lib"]
 
 [dependencies]
 pyo3 = { version = "0.28.2", features = ["extension-module"] }

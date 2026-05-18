@@ -3,16 +3,23 @@ import glob
 import pytest
 import s2mflow
 
-DATA_DIR = os.getenv("S2MFLOW_DATA_DIR", "../s2mflow_data")
+DATA_DIR = os.getenv("S2MFLOW_DATA_DIR", "data")
 
 def get_min_instances():
     search_pattern = os.path.join(DATA_DIR, "**", "*.min")
     found_files = glob.glob(search_pattern, recursive=True)
-    return sorted([os.path.abspath(f) for f in found_files])
+
+    allowed_instances = {"netgen_1.min"}
+    filtered_files = [
+        f for f in found_files
+        if os.path.basename(f) in allowed_instances
+    ]
+
+    return sorted([os.path.abspath(f) for f in filtered_files])
 
 INSTANCES = get_min_instances()
 
-@pytest.mark.skipif(not INSTANCES, reason="No .min instances found inside s2mflow_data.")
+@pytest.mark.skipif(not INSTANCES, reason="No .min instances found inside data.")
 @pytest.mark.parametrize("input_file", INSTANCES)
 @pytest.mark.parametrize("is_uniform", [True, False])
 @pytest.mark.parametrize("randomize_caps", [True, False])

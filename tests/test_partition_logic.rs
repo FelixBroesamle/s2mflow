@@ -3,7 +3,7 @@ use s2mflow::{load_min_instance, generate_multi_commodity_data};
 
 #[test]
 fn test_partition_logic() {
-    let data_dir_env = std::env::var("S2MFLOW_DATA_DIR").unwrap_or_else(|_| "../s2mflow_data".to_string());
+    let data_dir_env = std::env::var("S2MFLOW_DATA_DIR").unwrap_or_else(|_| "data".to_string());
     let data_dir = PathBuf::from(data_dir_env);
 
     if !data_dir.exists() {

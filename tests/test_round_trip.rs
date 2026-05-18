@@ -8,7 +8,7 @@ use s2mflow::{
 
 #[test]
 fn test_round_trip() {
-    let data_dir_env = std::env::var("S2MFLOW_DATA_DIR").unwrap_or_else(|_| "../s2mflow_data".to_string());
+    let data_dir_env = std::env::var("S2MFLOW_DATA_DIR").unwrap_or_else(|_| "data".to_string());
     let data_dir = PathBuf::from(data_dir_env);
 
     if !data_dir.exists() {

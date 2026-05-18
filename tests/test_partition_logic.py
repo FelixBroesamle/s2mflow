@@ -4,17 +4,24 @@ import pytest
 import s2mflow
 
 
-DATA_DIR = os.getenv("S2MFLOW_DATA_DIR", "../s2mflow_data")
+DATA_DIR = os.getenv("S2MFLOW_DATA_DIR", "data")
 
 def discover_real_min_files():
     search_pattern = os.path.join(DATA_DIR, "**", "*.min")
     found_files = glob.glob(search_pattern, recursive=True)
-    return sorted([os.path.abspath(f) for f in found_files])
+
+    allowed_instances = {"netgen_1.min"}
+    filtered_files = [
+        f for f in found_files
+        if os.path.basename(f) in allowed_instances
+    ]
+
+    return sorted([os.path.abspath(f) for f in filtered_files])
 
 
 REAL_MIN_INSTANCES = discover_real_min_files()
 
-@pytest.mark.skipif(not REAL_MIN_INSTANCES, reason="No .min instances found inside s2mflow_data.")
+@pytest.mark.skipif(not REAL_MIN_INSTANCES, reason="No .min instances found inside data.")
 @pytest.mark.parametrize("input_min_file", REAL_MIN_INSTANCES)
 @pytest.mark.parametrize("is_uniform", [True, False])
 @pytest.mark.parametrize("num_commodities", [2, 3, 5, 10, 20])

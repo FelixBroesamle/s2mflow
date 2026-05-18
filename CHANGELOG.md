@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this
 
+## [0.1.13] - 2026-05-19
+### Changed
+- Unified the core data layer to `i64` for type-safety and overflow prevention.
+
+### Added
+- Added a root-level `data/` directory with sample instances.
+- Added Rust integration tests (`test_round_trip` and `test_partition_logic`).
+
 ## [0.1.12] - 2026-05-18
 ### Added
 - Added testing infrastructure for multicommodity data generation (`test_partition_logic`).

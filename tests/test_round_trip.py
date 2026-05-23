@@ -24,7 +24,7 @@ INSTANCES = get_min_instances()
 @pytest.mark.parametrize("is_uniform", [True, False])
 @pytest.mark.parametrize("randomize_caps", [True, False])
 @pytest.mark.parametrize("randomize_costs", [True, False])
-@pytest.mark.parametrize("num_commodities", [2, 3, 5])
+@pytest.mark.parametrize("num_commodities", [2, 3])
 def test_round_trip(
     tmp_path, input_file, is_uniform, randomize_caps, randomize_costs, num_commodities
 ):

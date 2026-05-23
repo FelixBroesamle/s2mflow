@@ -1,9 +1,11 @@
 # s2mflow
 
+
 [![CI](https://github.com/FelixBroesamle/s2mflow/actions/workflows/ci.yml/badge.svg)](https://github.com/FelixBroesamle/s2mflow/actions/workflows/ci.yml)
 [![Documentation](https://readthedocs.org/projects/s2mflow/badge/?version=latest)](https://s2mflow.readthedocs.io/en/latest/?badge=latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![Python Version](https://img.shields.io/pypi/pyversions/s2mflow.svg?color=blue)](https://pypi.org/project/s2mflow/)
+
 
 **A high-performance meta-generation framework for lifting single-commodity flow instances into the multicommodity space.**
 

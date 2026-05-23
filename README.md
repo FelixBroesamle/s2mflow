@@ -1,5 +1,10 @@
 # s2mflow
 
+[![CI](https://github.com/FelixBroesamle/s2mflow/actions/workflows/ci.yml/badge.svg)](https://github.com/FelixBroesamle/s2mflow/actions/workflows/ci.yml)
+[![Documentation](https://readthedocs.org/projects/s2mflow/badge/?version=latest)](https://s2mflow.readthedocs.io/en/latest/?badge=latest)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![Python Version](https://img.shields.io/pypi/pyversions/s2mflow.svg?color=blue)](https://pypi.org/project/s2mflow/)
+
 **A high-performance meta-generation framework for lifting single-commodity flow instances into the multicommodity space.**
 
 `s2mflow` is a Python library [PyPI](https://pypi.org/project/s2mflow/) with a high-speed Rust core (via PyO3) designed to transform single-commodity minimum-cost flow (MCF) instances into minimum-cost multicommodity flow (MCMCF) instances. It is built for researchers in Operations Research, Mathematical Optimization, and Network Optimization who need to generate reproducible, scalable test data.

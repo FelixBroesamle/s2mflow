@@ -1,0 +1,33 @@
+name: CI
+
+on: [push]
+
+jobs:
+    test:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout Code
+              uses: actions/checkout@v4
+            
+            - name: Set up Rust Toolchain
+              uses: dtolnay/rust-toolchain@stable
+            
+            - name: Set up Python Environment
+              uses: actions/setup-python@v5
+              with:
+                python-version: '3.13'
+            
+            - name: Install Maturin & Poetry
+              run: pip install poetry maturin
+
+            - name: Install python Project Dependencies
+              run: poetry install
+            
+            - name: Run Native Rust Core Tests
+              run: cargo test --verbose
+            
+            - name: Build and Link PyO3 Bindings
+              run: poetry run maturin develop
+            
+            - name: Run Python API Tests
+              run: poettry run pytest -v

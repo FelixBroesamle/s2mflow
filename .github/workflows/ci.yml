@@ -2,6 +2,9 @@ name: CI
 
 on: [push]
 
+env:
+    CARGO_TERM__COLOR: always
+
 jobs:
     test:
         runs-on: ubuntu-latest
@@ -17,6 +20,9 @@ jobs:
               with:
                 python-version: '3.13'
             
+            - name: Rust Version Info
+              run: cargo --version
+            
             - name: Install Maturin & Poetry
               run: pip install poetry maturin
 
@@ -27,7 +33,8 @@ jobs:
               run: poetry run maturin develop
 
             - name: Run Native Rust Core Tests
-              run: cargo test --verbose
-              
+              run: |
+                RUSTFLAGS="-L $(python -c "import sysconfig; print(sysconfig.get_config_var('LIBDIR'))") -lpython$(python -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')")" poetry run cargo test --verbose
+
             - name: Run Python API Tests
               run: poetry run pytest -v

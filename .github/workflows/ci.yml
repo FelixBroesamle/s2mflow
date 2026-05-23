@@ -28,6 +28,6 @@ jobs:
 
             - name: Run Native Rust Core Tests
               run: cargo test --verbose
-            
+              
             - name: Run Python API Tests
-              run: poettry run pytest -v
+              run: poetry run pytest -v

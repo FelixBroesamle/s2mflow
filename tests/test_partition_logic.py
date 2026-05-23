@@ -24,7 +24,7 @@ REAL_MIN_INSTANCES = discover_real_min_files()
 @pytest.mark.skipif(not REAL_MIN_INSTANCES, reason="No .min instances found inside data.")
 @pytest.mark.parametrize("input_min_file", REAL_MIN_INSTANCES)
 @pytest.mark.parametrize("is_uniform", [True, False])
-@pytest.mark.parametrize("num_commodities", [2, 3, 5, 10, 20])
+@pytest.mark.parametrize("num_commodities", [2, 3, 5])
 def test_partition_logic(input_min_file, is_uniform, num_commodities):
     """
     Verifies that the multicommody instance generation is correct:

@@ -1,0 +1,40 @@
+name: CI
+
+on: [push]
+
+env:
+    CARGO_TERM__COLOR: always
+
+jobs:
+    test:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout Code
+              uses: actions/checkout@v4
+            
+            - name: Set up Rust Toolchain
+              uses: dtolnay/rust-toolchain@stable
+            
+            - name: Set up Python Environment
+              uses: actions/setup-python@v5
+              with:
+                python-version: '3.13'
+            
+            - name: Rust Version Info
+              run: cargo --version
+            
+            - name: Install Maturin & Poetry
+              run: pip install poetry maturin
+
+            - name: Install python Project Dependencies
+              run: poetry install
+            
+            - name: Build and Link PyO3 Bindings
+              run: poetry run maturin develop
+
+            - name: Run Native Rust Core Tests
+              run: |
+                RUSTFLAGS="-L $(python -c "import sysconfig; print(sysconfig.get_config_var('LIBDIR'))") -lpython$(python -c "import sys; print(f'{sys.version_info.major}.{sys.version_info.minor}')")" poetry run cargo test --verbose
+
+            - name: Run Python API Tests
+              run: poetry run pytest -v

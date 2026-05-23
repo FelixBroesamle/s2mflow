@@ -23,11 +23,11 @@ jobs:
             - name: Install python Project Dependencies
               run: poetry install
             
-            - name: Run Native Rust Core Tests
-              run: cargo test --verbose
-            
             - name: Build and Link PyO3 Bindings
               run: poetry run maturin develop
+
+            - name: Run Native Rust Core Tests
+              run: cargo test --verbose
             
             - name: Run Python API Tests
               run: poettry run pytest -v

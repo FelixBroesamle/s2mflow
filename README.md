@@ -36,8 +36,19 @@ The library uses a natural extension of the DIMACS `.min` format to support mult
 
 ## Installation
 
+**Standard Installation**
 ```bash
 pip install s2mflow
+# or via poetry
+poetry add s2mflow
+```
+
+**Building from Source**
+```bash
+git clone https://github.com/FelixBroesamle/s2mflow.git
+cd s2mflow
+poetry install -vvv
+poetry run maturin develop --release
 ```
 
 ## Quick Start
@@ -91,6 +102,8 @@ s2mflow.save_multi_commodity_instance("output.mcfmin", network, mc_data)
 # a 4 1 0 10 10 3
 # a 4 2 0 19 19 2
 ```
+
+See also `examples/demo.py`.
 
 ## Citing
 

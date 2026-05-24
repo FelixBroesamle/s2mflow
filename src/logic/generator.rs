@@ -6,10 +6,10 @@ use rand::rngs::StdRng;
 use crate::models::MultiCommodityData;
 
 pub fn split_supply_and_demand_uniform(
-    data: &BTreeMap<i32, i32>,
+    data: &BTreeMap<i64, i64>,
     num_commodities: usize,
-) -> BTreeMap<i32, Vec<i32>> {
-    let mut commodity_data: BTreeMap<i32, Vec<i32>> = BTreeMap::new();
+) -> BTreeMap<i64, Vec<i64>> {
+    let mut commodity_data: BTreeMap<i64, Vec<i64>> = BTreeMap::new();
 
     // next_k determines which commodity gets the 'remainder' unit.
     let mut next_k = 0;
@@ -18,12 +18,12 @@ pub fn split_supply_and_demand_uniform(
     // Truncation to zero: - 8 / 3 = -2 and -8 % 3 = -2.
     for (&node, &total_val) in data {
         // sign(b_i) floor (abs(b_i) / K)
-        let base_val = total_val / (num_commodities as i32);
+        let base_val = total_val / (num_commodities as i64);
         let mut node_data = vec![base_val; num_commodities];
 
         let sign = total_val.signum();
         // abs(b_i) mod K
-        let remainder = (total_val % (num_commodities as i32)).abs();
+        let remainder = (total_val % (num_commodities as i64)).abs();
 
         for _ in 0..remainder {
             node_data[next_k] += sign;
@@ -40,20 +40,20 @@ pub fn split_supply_and_demand_uniform(
 
 
 pub fn split_supply_and_demand_spread(
-    data: &BTreeMap<i32, i32>,
+    data: &BTreeMap<i64, i64>,
     num_commodities: usize,
     seed: u64,
-) -> BTreeMap<i32, Vec<i32>> {
+) -> BTreeMap<i64, Vec<i64>> {
     let mut rng = StdRng::seed_from_u64(seed);
-    let mut commodity_data: BTreeMap<i32, Vec<i32>> = BTreeMap::new();
+    let mut commodity_data: BTreeMap<i64, Vec<i64>> = BTreeMap::new();
 
     for (&node, &demand) in data {
         if demand == 0 { continue; }
 
         let abs_demand = demand.abs();
-        let mut sample = vec![0i32; num_commodities];
+        let mut sample = vec![0i64; num_commodities];
         
-        let mut cuts: Vec<i32> = (0..num_commodities - 1).map(|_| rng.random_range(0..=abs_demand)).collect();
+        let mut cuts: Vec<i64> = (0..num_commodities - 1).map(|_| rng.random_range(0..=abs_demand)).collect();
         cuts.sort_unstable();
 
         let mut last = 0;
@@ -78,19 +78,19 @@ pub fn split_supply_and_demand_spread(
 
 
 fn balance_commodities(
-    commodity_data: &mut BTreeMap<i32, Vec<i32>>,
-    original_data: &BTreeMap<i32, i32>,
+    commodity_data: &mut BTreeMap<i64, Vec<i64>>,
+    original_data: &BTreeMap<i64, i64>,
     num_commodities: usize
 ) {
     // 1. Compute current global balances
-    let mut current_balances = vec![0i32; num_commodities];
+    let mut current_balances = vec![0i64; num_commodities];
     for sample in commodity_data.values() {
         for k in 0..num_commodities {
             current_balances[k] += sample[k];
         }
     }
 
-    let sorted_nodes: Vec<i32> = commodity_data.keys().copied().collect();
+    let sorted_nodes: Vec<i64> = commodity_data.keys().copied().collect();
     let n = sorted_nodes.len();
 
     let mut node_ptr = 0;
@@ -198,14 +198,14 @@ pub fn generate_multi_commodity_data(
             let cost = if randomize_costs {
                 let raw_cost = rng.random_range(cost_low..cost_high);
                 let floor_val = if edge.cost == 0 { 0 } else { 1 };
-                (raw_cost.ceil() as i32).max(floor_val)
+                (raw_cost.ceil() as i64).max(floor_val)
             } else {
                 edge.cost
             };
             arc_costs.push(cost);
 
             let cap = if randomize_caps {
-                (rng.random_range(cap_low..cap_high).ceil() as i32).max(1)
+                (rng.random_range(cap_low..cap_high).ceil() as i64).max(1)
             } else {
                 edge.up
             };
@@ -217,7 +217,7 @@ pub fn generate_multi_commodity_data(
 
     let mut commodity_weights = Vec::with_capacity(num_commodities);
     for k in 0..num_commodities {
-        let w: Vec<i32> = (0..num_original_edges).map(|i| weights_by_arc[&i][k]).collect();
+        let w: Vec<i64> = (0..num_original_edges).map(|i| weights_by_arc[&i][k]).collect();
         commodity_weights.push(w);
     }
 
@@ -233,6 +233,106 @@ pub fn generate_multi_commodity_data(
         randomized_capacities: randomize_caps, 
         randomized_weights: randomize_costs, 
         seed: seed,
+    }
+
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::collections::BTreeMap;
+
+    /// Test Phase 1: Local Partitioning (Node-wise Split)
+    /// Goal: Ensure the sum of partitioned commodities at a node matches the original node supply.
+    #[test]
+    fn test_local_partitioning() {
+        let mut supplies = BTreeMap::new();
+        supplies.insert(1, 10);
+        supplies.insert(2, -10);
+
+        let num_commodities = 3;
+        
+        // Test Uniform
+        let res_uniform = split_supply_and_demand_uniform(&supplies, num_commodities);
+
+        for (&node, &original_val) in &supplies {
+            let partition = &res_uniform[&node];
+
+            // Check Sum
+            let partition_sum: i64 = partition.iter().sum();
+            assert_eq!(partition_sum, original_val, "Uniform split sum mismatch at node {}", node);
+
+            // Check Sign Consistency
+            for &val in partition {
+                if original_val > 0 {
+                    assert!(val >= 0, "Node {} is supply (>0) but has negative commodity value {}", node, val);
+                } else if original_val < 0 {
+                    assert!(val <= 0, "Node {} is demand (<0) but has positive commodity value {}", node, val);
+                }
+            }
+        }
+
+        // Test Spread
+        let res_spread = split_supply_and_demand_spread(&supplies, num_commodities, 42);
+        for (&node, &original_val) in &supplies {
+            let partition = &res_spread[&node];
+            
+            // Check sum
+            let partition_sum: i64 = partition.iter().sum();
+            assert_eq!(partition_sum, original_val, "Spread split sum mismatch at node {}", node);
+
+            // Check Sign Consistency
+            for &val in partition {
+                if original_val > 0 {
+                    assert!(val >= 0, "Node {} is supply (>0) but has negative commodity value {}", node, val);
+                } else if original_val < 0 {
+                    assert!(val <= 0, "Node {} is demand (<0) but has positive commodity value {}", node, val);
+                }
+            }
+
+        }
+    }
+
+    /// Test Phase 2: Global Balancing (Commodity-wise Zero Sum)
+    /// Goal: Ensure that after balancing, the sum of a specific commodity across all nodes is 0.
+    #[test]
+    fn test_balance_commodities() {
+        let mut commodity_data = BTreeMap::new();
+        commodity_data.insert(1, vec![3, 8, 2]);
+        commodity_data.insert(2, vec![0, 1, 1]);
+        commodity_data.insert(3, vec![2, 0, 3]);
+        commodity_data.insert(4, vec![-1, -4, -1]);
+        commodity_data.insert(5, vec![-2, -9, -3]);
+
+        let original_data = BTreeMap::from([(1, 13), (2, 2), (3, 5), (4, -6), (5, -14)]);
+        let num_commodities = 3;
+
+        balance_commodities(&mut commodity_data, &original_data, num_commodities);
+
+        // Verify Global Balance: sum_i(b_i^k) == 0
+        for k in 0..num_commodities {
+            let global_sum: i64 = commodity_data.values().map(|v| v[k]).sum();
+            assert_eq!(global_sum, 0, "Global balance failed for commodity {}", k);
+        }
+
+        // Re-verify Local  Balance (sum_k(b_i^k) == b_i) and Sign Consistency
+        for (&node, &original_val) in &original_data {
+            let partition = &commodity_data[&node];
+
+            // Local Sum
+            let local_sum: i64 = partition.iter().sum();
+            assert_eq!(local_sum, original_val, "Local balance failed at node {} after global balancing", node);
+
+            // Sign Consistency (Post-Balancing)
+            for &val in partition {
+                if original_val > 0 {
+                    assert!(val >= 0, "Balancing pushed node {} (supply) to negative value {}", node, val);
+                } else if original_val < 0 {
+                    assert!(val <= 0, "Balanving pushed node {} (demand) to positive value {}", node, val);
+                }
+            }
+        }
+
     }
 
 }

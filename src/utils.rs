@@ -38,8 +38,8 @@ pub fn parse_min(path: &str) -> Result<NetworkInstance, Box<dyn std::error::Erro
                 weights.reserve(num_arcs as usize);
             }
             "n" => {
-                let node_id: i32 = tokens[1].parse()?;
-                let val: i32 = tokens[2].parse()?;
+                let node_id: i64 = tokens[1].parse()?;
+                let val: i64 = tokens[2].parse()?;
                 supplies.insert(node_id, val);
 
                 if node_seen.insert(node_id) {
@@ -47,11 +47,11 @@ pub fn parse_min(path: &str) -> Result<NetworkInstance, Box<dyn std::error::Erro
                 }
             }
             "a" => {
-                let tail: i32 = tokens[1].parse()?;
-                let head: i32 = tokens[2].parse()?;
-                let low: i32 = tokens[3].parse()?;
-                let up: i32 = tokens[4].parse()?;
-                let cost: i32 = tokens[5].parse()?;
+                let tail: i64 = tokens[1].parse()?;
+                let head: i64 = tokens[2].parse()?;
+                let low: i64 = tokens[3].parse()?;
+                let up: i64= tokens[4].parse()?;
+                let cost: i64 = tokens[5].parse()?;
 
                 edges.push(Edge { tail, head, low, up, cost });
 
@@ -122,9 +122,9 @@ pub fn parse_multi_min(path: &str) -> Result<ParsedMulticommodityInstance, Box<d
                 num_commodities = tokens[4].parse()?;
                 seed = tokens[8].parse()?;
 
-                rand_caps = tokens.get(5).map_or(Ok(0), |t| t.parse::<i32>())? != 0;
-                rand_costs = tokens.get(6).map_or(Ok(0), |t| t.parse::<i32>())? != 0;
-                is_uniform = tokens.get(7).map_or(Ok(0), |t| t.parse::<i32>())? != 0;
+                rand_caps = tokens.get(5).map_or(Ok(0), |t| t.parse::<i64>())? != 0;
+                rand_costs = tokens.get(6).map_or(Ok(0), |t| t.parse::<i64>())? != 0;
+                is_uniform = tokens.get(7).map_or(Ok(0), |t| t.parse::<i64>())? != 0;
 
                 edges.reserve(num_arcs as usize);
                 capacities.reserve(num_arcs as usize);
@@ -133,7 +133,7 @@ pub fn parse_multi_min(path: &str) -> Result<ParsedMulticommodityInstance, Box<d
             }
 
             "n" => {
-                let node_id: i32 = tokens[1].parse::<i32>()?;
+                let node_id: i64 = tokens[1].parse::<i64>()?;
 
                 let supply_vals: Vec<i64> = tokens[3..].iter().map(|&t| t.parse::<i64>()).collect::<Result<Vec<_>, _>>()?;
 
@@ -145,15 +145,16 @@ pub fn parse_multi_min(path: &str) -> Result<ParsedMulticommodityInstance, Box<d
             }
 
             "a" => {
-                let u: i32 = tokens[1].parse::<i32>()?;
-                let v: i32 = tokens[2].parse::<i32>()?;
-                let up: i32 = tokens[4].parse()?;
+                let u: i64 = tokens[1].parse::<i64>()?;
+                let v: i64 = tokens[2].parse::<i64>()?;
+                let up: i64 = tokens[4].parse()?;
 
                 let k = num_commodities as usize;
                 let mut current_idx = 5;
 
                 let parsed_caps: Vec<i64> = if rand_caps {
                     let res = tokens[current_idx..(current_idx + k)].iter().map(|&t| t.parse::<i64>()).collect::<Result<Vec<_>, _>>()?;
+                    current_idx += k;
                     res
                 } else {
                     let val = tokens[current_idx].parse::<i64>()?;
@@ -257,7 +258,7 @@ pub fn export_to_dimacs(
 
     // 3. Node Lines: n <id> <total_supply> <c1> <c2> ...
     for (&node_id, supplies) in &multi_data.supply_partition {
-        let total_supply: i32 = supplies.iter().sum();
+        let total_supply: i64 = supplies.iter().sum();
         let supplies_str: Vec<String> = supplies.iter().map(|s| s.to_string()).collect();
         writeln!(writer, "n {} {} {}", node_id, total_supply, supplies_str.join(" "))?;
     }
@@ -285,11 +286,11 @@ pub fn export_to_dimacs(
 }
 
 pub fn get_incidence_mapping(
-    nodes: Vec<i32>,
-    edges: Vec<(i32, i32)>
-) -> (BTreeMap<i32, Vec<i32>>, BTreeMap<i32, Vec<i32>>) {
-    let mut incoming: BTreeMap<i32, Vec<i32>> = BTreeMap::new();
-    let mut outgoing: BTreeMap<i32, Vec<i32>> = BTreeMap::new();
+    nodes: Vec<i64>,
+    edges: Vec<(i64, i64)>
+) -> (BTreeMap<i64, Vec<i64>>, BTreeMap<i64, Vec<i64>>) {
+    let mut incoming: BTreeMap<i64, Vec<i64>> = BTreeMap::new();
+    let mut outgoing: BTreeMap<i64, Vec<i64>> = BTreeMap::new();
 
     for &node in &nodes {
         incoming.insert(node, Vec::new());

@@ -5,6 +5,42 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this
 
+## [0.1.13] - 2026-05-19
+### Changed
+- Unified the core data layer to `i64` for type-safety and overflow prevention.
+
+### Added
+- Added a root-level `data/` directory with sample instances.
+- Added Rust integration tests (`test_round_trip` and `test_partition_logic`).
+
+## [0.1.12] - 2026-05-18
+### Added
+- Added testing infrastructure for multicommodity data generation (`test_partition_logic`).
+- Added end-to-end file round-trip test (`test_round_trip`).
+
+## [0.1.11] - 2026-05-17
+### Fixed
+- Fixed CI.
+
+## [0.1.10] - 2026-05-17
+### Fixed
+- `src/utils.rs`: fixed bug inside the multicommodity parser.
+
+## [0.1.9] - 2026-05-16
+### Added
+- Upgraded to **Rust Edition 2024**.
+
+### Fixed
+- Inside `.github/workflows/release.yml`: directory tracking path masks (`dist/*.whl` and `dist/*.tar.gz`).
+
+## [0.1.8] - 2026-05-06
+### Added
+- Added basic tests.
+
+## [0.1.7] - 2026-04-06
+### Changed
+- Adjusted `README.md` and citation.
+
 ## [0.1.6] - 2026-03-29
 ### Changed
 - Documentation.

@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this
 
+## [0.1.15] - 2026-05-24
+### Added
+- Added `examples/demo.py`.
+- Added `Building from Source` in `README.md`.
+
 ## [0.1.14] - 2026-05-23
 ### Added
 - CI/CD Pipeline: Integrated GitHub Actions (`ci.yml`) to automate testing for both the native Rust core and Python API.

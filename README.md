@@ -43,8 +43,19 @@ The library uses a natural extension of the DIMACS `.min` format to support mult
 
 ## Installation
 
+**Standard Installation**
 ```bash
 pip install s2mflow
+# or via poetry
+poetry add s2mflow
+```
+
+**Building from Source**
+```bash
+git clone https://github.com/FelixBroesamle/s2mflow.git
+cd s2mflow
+poetry install -vvv
+poetry run maturin develop --release
 ```
 
 ## Quick Start

@@ -12,10 +12,8 @@ jobs:
             - name: Checkout Code
               uses: actions/checkout@v4
             
-            - name: Install Rust Toolchain
-              run: |
-                rustup update stable
-                rustup default stable
+            - name: Set up Rust Toolchain
+              uses: dtolnay/rust-toolchain@stable
             
             - name: Set up Python Environment
               uses: actions/setup-python@v5

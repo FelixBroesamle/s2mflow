@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this
 
+## [0.1.17] - 2026-05-26
+### Changed
+- Updated documentation.
+
 ## [0.1.16] - 2026-05-26
 ### Changed
 - Renamed `num_k` to `num_commodities` in `split_supplies_uniform` and `split_supplies_spread` for consistency in API.

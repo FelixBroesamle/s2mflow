@@ -66,24 +66,24 @@ def load_min_instance(path: str) -> NetworkInstance:
     """
     ...
 
-def split_supplies_uniform(data: Dict[int, int], num_k: int) -> Dict[int, List[int]]:
+def split_supplies_uniform(data: Dict[int, int], num_commodities: int) -> Dict[int, List[int]]:
     """Partitions nodal supply/demand into K commodities using a uniform distribution.
     
     Args:
         data (Dict[int, int]): A mapping of node IDs to their total supply/demand.
-        num_k (int): The number of commodities.
+        num_commodities (int): The number of commodities.
         
     Returns:
         Dict[int, List[int]]: A mapping where each node ID points to a list of the commodity supplies/demands.
     """
     ...
 
-def split_supplies_spread(data: Dict[int, int], num_k: int, seed: int) -> Dict[int, List[int]]:
+def split_supplies_spread(data: Dict[int, int], num_commodities: int, seed: int) -> Dict[int, List[int]]:
     """Partitions nodal supply/demand into K commodities using a spread distribution.
     
     Args:
         data (Dict[int, int]): A mapping of node IDs to their total supply/demand.
-        num_k (int): The number of commodities.
+        num_commodities (int): The number of commodities.
         seed (int): Seed.
         
     Returns:
@@ -97,7 +97,7 @@ def generate_multi_commodity_data(
     is_uniform: bool,
     randomize_caps: bool = False,
     cap_a: float = 0.8,
-    cap_b: float = 1.2,
+    cap_b: float = 1.0,
     randomize_costs: bool = False,
     cost_a: float = 0.8,
     cost_b: float = 1.2,

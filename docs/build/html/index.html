@@ -398,7 +398,7 @@ interface via PyO3.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="s2mflow.generate_multi_commodity_data">
-<span class="sig-prename descclassname"><span class="pre">s2mflow.</span></span><span class="sig-name descname"><span class="pre">generate_multi_commodity_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_commodities</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_uniform</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">randomize_caps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cap_a</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cap_b</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">randomize_costs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cost_a</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cost_b</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">42</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#s2mflow.generate_multi_commodity_data" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">s2mflow.</span></span><span class="sig-name descname"><span class="pre">generate_multi_commodity_data</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instance</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_commodities</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_uniform</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">randomize_caps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cap_a</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cap_b</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">randomize_costs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cost_a</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cost_b</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">42</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#s2mflow.generate_multi_commodity_data" title="Link to this definition"></a></dt>
 <dd><p>Generates a full multi-commodity dataset from a single-commodity instance.</p>
 <p>This function handles the partitioning of supplies and the optional randomization of
 arc capacities and costs across commodities.</p>
@@ -407,13 +407,13 @@ arc capacities and costs across commodities.</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>instance</strong> (<a class="reference internal" href="#s2mflow.NetworkInstance" title="s2mflow.NetworkInstance"><em>NetworkInstance</em></a>) – The base single-commodity network.</p></li>
 <li><p><strong>num_commodities</strong> (<em>int</em>) – The number of commodities.</p></li>
-<li><p><strong>is_uniform</strong> (<em>bool</em>) – If Ture, uses uniform partitioning; otherwise, uses spread.</p></li>
+<li><p><strong>is_uniform</strong> (<em>bool</em>) – If True, uses uniform partitioning; otherwise, uses spread.</p></li>
 <li><p><strong>randomize_caps</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, varies capacities per commodity. Default to False.</p></li>
 <li><p><strong>cap_a</strong> (<em>float</em><em>, </em><em>optional</em>) – Lower multiplier for capacity randomization. Defaults to 0.8.</p></li>
-<li><p><strong>cap_b</strong> (<em>float</em><em>, </em><em>optional</em>) – Upper multiplier for capacity randomization. Defaults to 1.2.</p></li>
+<li><p><strong>cap_b</strong> (<em>float</em><em>, </em><em>optional</em>) – Upper multiplier for capacity randomization. Defaults to 1.0.</p></li>
 <li><p><strong>randomize_costs</strong> (<em>bool</em><em>, </em><em>optional</em>) – If True, varies costs per commodity. Defaults to False.</p></li>
 <li><p><strong>cost_a</strong> (<em>float</em><em>, </em><em>optional</em>) – Lower multiplier for cost randomization. Defaults to 0.8.</p></li>
-<li><p><strong>cost_b</strong> (<em>float</em><em>, </em><em>optional</em>) – Upper multiplier for cost randomization. defaults to 1.2.</p></li>
+<li><p><strong>cost_b</strong> (<em>float</em><em>, </em><em>optional</em>) – Upper multiplier for cost randomization. Defaults to 1.2.</p></li>
 <li><p><strong>seed</strong> (<em>int</em><em>, </em><em>optional</em>) – Seed.</p></li>
 </ul>
 </dd>
@@ -429,7 +429,7 @@ arc capacities and costs across commodities.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="s2mflow.get_incidence_mapping">
 <span class="sig-prename descclassname"><span class="pre">s2mflow.</span></span><span class="sig-name descname"><span class="pre">get_incidence_mapping</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">nodes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">edges</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#s2mflow.get_incidence_mapping" title="Link to this definition"></a></dt>
-<dd><p>Creates indidence mapping from nodes and edges.</p>
+<dd><p>Creates incidence mapping from nodes and edges.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -510,13 +510,13 @@ expanded per-commodity values when necessary.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="s2mflow.split_supplies_spread">
-<span class="sig-prename descclassname"><span class="pre">s2mflow.</span></span><span class="sig-name descname"><span class="pre">split_supplies_spread</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_k</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#s2mflow.split_supplies_spread" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">s2mflow.</span></span><span class="sig-name descname"><span class="pre">split_supplies_spread</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_commodities</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#s2mflow.split_supplies_spread" title="Link to this definition"></a></dt>
 <dd><p>Partitions nodal supply/demand into K commodities using a spread distribution.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> (<em>Dict</em><em>[</em><em>int</em><em>, </em><em>int</em><em>]</em>) – A mapping of node IDs to their total supply/demand.</p></li>
-<li><p><strong>num_k</strong> (<em>int</em>) – The number of commodities.</p></li>
+<li><p><strong>num_commodities</strong> (<em>int</em>) – The number of commodities.</p></li>
 <li><p><strong>seed</strong> (<em>int</em>) – Seed.</p></li>
 </ul>
 </dd>
@@ -531,13 +531,13 @@ expanded per-commodity values when necessary.</p>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="s2mflow.split_supplies_uniform">
-<span class="sig-prename descclassname"><span class="pre">s2mflow.</span></span><span class="sig-name descname"><span class="pre">split_supplies_uniform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_k</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#s2mflow.split_supplies_uniform" title="Link to this definition"></a></dt>
+<span class="sig-prename descclassname"><span class="pre">s2mflow.</span></span><span class="sig-name descname"><span class="pre">split_supplies_uniform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_commodities</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#s2mflow.split_supplies_uniform" title="Link to this definition"></a></dt>
 <dd><p>Partitions nodal supply/demand into K commodities using a uniform distribution.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>data</strong> (<em>Dict</em><em>[</em><em>int</em><em>, </em><em>int</em><em>]</em>) – A mapping of node IDs to their total supply/demand.</p></li>
-<li><p><strong>num_k</strong> (<em>int</em>) – The number of commodities.</p></li>
+<li><p><strong>num_commodities</strong> (<em>int</em>) – The number of commodities.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>

@@ -159,12 +159,12 @@ def load_multi_commodity_instance(path: str) -> ParsedMulticommodityInstance:
     """
     ...
 
-def get_incidence_mapping(
+def get_adjacency_mapping(
     nodes: list[int], 
     edges: list[tuple[int, int]]
 ) -> tuple[dict[int, list[int]], dict[int, list[int]]]: 
     """
-    Create incidence mapping (incoming, outgoing).
+    Create adjacency mapping (incoming, outgoing).
 
     Args:
         nodes (int): List of node IDs.

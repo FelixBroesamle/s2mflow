@@ -285,7 +285,7 @@ pub fn export_to_dimacs(
     Ok(())
 }
 
-pub fn get_incidence_mapping(
+pub fn get_adjacency_mapping(
     nodes: Vec<i64>,
     edges: Vec<(i64, i64)>
 ) -> (BTreeMap<i64, Vec<i64>>, BTreeMap<i64, Vec<i64>>) {

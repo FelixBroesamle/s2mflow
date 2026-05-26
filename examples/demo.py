@@ -128,3 +128,7 @@ if __name__ == "__main__":
 
     print(spread_multi_data)
     print(uniform_multi_data)
+
+    incoming, outgoing = s2mflow.get_adjacency_mapping(network.nodes, network.arcs)
+    print(incoming)
+    print(outgoing)

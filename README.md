@@ -25,7 +25,7 @@ Felix P. Broesamle and Stefan Nickel. 2026. "On the Single-Multi-Commodity Gap: 
     - `uniform`: Equal distribution of supply and demand across commodities.
     - `spread`: Randomized, heterogeneous distribution of supply and demand across commodities.
 - **Randomizing Capacities and Costs**: Functionality for generating randomized commodity-specific capacities and costs for each arc.
-- **Network Utilities**: Support for identifying incoming and outgoing edges.
+- **Network Utilities**: Support for identifying incoming and outgoing neighboring nodes.
 
 ## The Extended `.mcfmin` Format
 

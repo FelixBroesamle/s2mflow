@@ -19,7 +19,8 @@ if __name__ == "__main__":
         a 3 4 0 15 4
     """)
 
-    NUM_COMMODITIES = 4
+    NUM_COMMODITIES = 3
+    SEED = 512
 
     exp_file = os.path.join(EXAMPLES_DIR, "exp_network.min")
     with open(exp_file, "w") as f:
@@ -50,7 +51,7 @@ if __name__ == "__main__":
         is_uniform=False,
         randomize_caps=False,
         randomize_costs=False,
-        seed=42,
+        seed=SEED,
     )
     
     output_path = os.path.join(EXAMPLES_DIR, "spread.mcfmin")
@@ -67,7 +68,7 @@ if __name__ == "__main__":
         cap_a=0.6,
         cap_b=1.0,
         randomize_costs=False,
-        seed=42,
+        seed=SEED,
     )
 
     output_path = os.path.join(EXAMPLES_DIR, "spread_rand_caps.mcfmin")
@@ -84,7 +85,7 @@ if __name__ == "__main__":
         randomize_costs=True,
         cost_a=0.5,
         cost_b=2.0,
-        seed=42,
+        seed=SEED,
     )
 
     output_path = os.path.join(EXAMPLES_DIR, "spread_rand_costs.mcfmin")
@@ -103,10 +104,26 @@ if __name__ == "__main__":
         randomize_costs=True,
         cost_a=0.5,
         cost_b=2.0,
-        seed=42,
+        seed=SEED,
     )
 
     output_path = os.path.join(EXAMPLES_DIR, "spread_rand_caps_costs.mcfmin")
     s2mflow.save_multi_commodity_instance(output_path, network, spread_mc_rand_caps_costs_data)
 
     loaded_spread_mc_rand_caps_costs_data = s2mflow.load_multi_commodity_instance(output_path)
+
+    data = {1: 126, 2: -126}
+
+    spread_multi_data = s2mflow.split_supplies_spread(
+        data, 
+        num_commodities=5, 
+        seed=SEED
+    )
+
+    uniform_multi_data = s2mflow.split_supplies_uniform(
+        data,
+        num_commodities=5,
+    )
+
+    print(spread_multi_data)
+    print(uniform_multi_data)

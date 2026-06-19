@@ -265,7 +265,7 @@ pub fn export_to_dimacs(
 
     // 4. Arc Lines: a <tail> <head> <low> <upp> <cost_c1> <cost_c2> ...
     for (i, edge) in instance.edges.iter().enumerate() {
-        let caps = &multi_data.capacites_by_arc[&i];
+        let caps = &multi_data.capacities_by_arc[&i];
         let costs = &multi_data.weights_by_arc[&i];
 
         let caps_to_write = if multi_data.randomized_capacities { caps.as_slice() } else { &caps[0..1] };

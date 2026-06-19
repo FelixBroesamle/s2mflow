@@ -24,6 +24,13 @@ classifiers = [
 ]
 dependencies = []
 
+[project.optional-dependencies]
+solver = [
+    "pyomo>=6.1.0",
+    "highspy>=1.10.0",
+    "gurobipy>=13.0.0",
+]
+
 [project.urls]
 Homepage = "https://github.com/FelixBroesamle/s2mflow"
 Repository = "https://github.com/FelixBroesamle/s2mflow"

@@ -69,6 +69,6 @@ def test_round_trip(
     
     for i, edge in enumerate(network.edges):
         arc_key = (edge.tail, edge.head)
-        assert loaded_mc_data.commodity_capacities[arc_key] == generated_mc_data.capacites_by_arc[i]
+        assert loaded_mc_data.commodity_capacities[arc_key] == generated_mc_data.capacities_by_arc[i]
         assert loaded_mc_data.commodity_weights[arc_key] == generated_mc_data.weights_by_arc[i]
 

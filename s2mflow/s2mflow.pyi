@@ -23,11 +23,13 @@ class MultiCommoditySupplies:
 class MultiCommodityData:
     supply_partition: Dict[int, List[int]]
     is_uniform: bool
-    edges: List[Tuple[int, int, int]]
+    commodity_edges: List[Tuple[int, int, int]]
     capacities: List[int]
     weight: List[List[int]]
     weights_by_arc: Dict[int, List[int]]
-    capacites_by_arc: Dict[int, List[int]]
+    capacities_by_arc: Dict[int, List[int]]
+    commodity_capacities: Dict[Tuple[int, int], List[int]]
+    commodity_weights: Dict[Tuple[int, int], List[int]]
     num_commodities: int
     randomized_capacities: bool
     randomized_weights: bool

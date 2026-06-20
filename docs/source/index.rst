@@ -39,6 +39,15 @@ If you want to build `s2mflow` from source, ensure you have the Rust toolchain i
    poetry install -vvv
    poetry run maturin develop --release
 
+**Running Mathematical Models**
+
+To run the mathematical modeling examples, install the optional solver dependencies:
+
+.. code-block:: bash
+
+   poetry install --extras solver
+
+
 .. toctree::
    :maxdepth: 2
    :caption: User Guide:

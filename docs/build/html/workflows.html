@@ -1,0 +1,278 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>End-to-End Optimization Workflows &mdash; s2mflow 0.1.19 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=3d116926"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="The .mcfmin Data Format" href="format.html" />
+    <link rel="prev" title="s2mflow: Multicommodity Flow Instance Generator" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            s2mflow
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">End-to-End Optimization Workflows</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#data-generation-serialization-pipeline">1. Data Generation &amp; Serialization Pipeline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#file-based-parsing-with-pyomo-highs-open-source">2. File-Based Parsing with Pyomo &amp; HiGHS (Open-Source)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#in-memory-generation-with-gurobi-commercial-solver">3. In-Memory Generation with Gurobi (Commercial Solver)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="format.html">The .mcfmin Data Format</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developer Guide:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#classes">Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#functions">Functions</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">s2mflow</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">End-to-End Optimization Workflows</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/workflows.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="end-to-end-optimization-workflows">
+<h1>End-to-End Optimization Workflows<a class="headerlink" href="#end-to-end-optimization-workflows" title="Link to this heading"></a></h1>
+<p>The instance attributes exposed by <code class="docutils literal notranslate"><span class="pre">s2mflow</span></code> integrate seamlessly into algebraic modeling languages and solvers. By utilizing unified, tuple-keyed dictionary structures, you can map the generated multicommodity data directly to solver variables and constraints.</p>
+<p>We have provided complete, runnable workflows in the <code class="docutils literal notranslate"><span class="pre">examples/</span></code> directory of the repository. Below are the primary integration workflows.</p>
+<section id="data-generation-serialization-pipeline">
+<h2>1. Data Generation &amp; Serialization Pipeline<a class="headerlink" href="#data-generation-serialization-pipeline" title="Link to this heading"></a></h2>
+<p>Before executing optimization routines, you must generate the multicommodity benchmark data. This workflow demonstrates how to load a standard DIMACS single-commodity network, apply a generation strategy (such as the heterogeneous <code class="docutils literal notranslate"><span class="pre">Spread</span></code> method with added capacity/cost noise), and serialize the output to disk for reproducible experimentation.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">s2mflow</span>
+
+<span class="c1"># 1. Load a baseline single-commodity network (DIMACS .min format)</span>
+<span class="n">network</span> <span class="o">=</span> <span class="n">s2mflow</span><span class="o">.</span><span class="n">load_min_instance</span><span class="p">(</span><span class="s2">&quot;data/input.min&quot;</span><span class="p">)</span>
+
+<span class="c1"># 2. Lift into the multicommodity space</span>
+<span class="c1"># Using the &#39;Spread&#39; strategy with randomized noise bounds</span>
+<span class="n">mc_data</span> <span class="o">=</span> <span class="n">s2mflow</span><span class="o">.</span><span class="n">generate_multi_commodity_data</span><span class="p">(</span>
+    <span class="n">instance</span><span class="o">=</span><span class="n">network</span><span class="p">,</span>
+    <span class="n">num_commodities</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+    <span class="n">is_uniform</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>       <span class="c1"># Activates stochastic Spread partitioning</span>
+    <span class="n">randomize_caps</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
+    <span class="n">cap_a</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span> 
+    <span class="n">cap_b</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">randomize_costs</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> 
+    <span class="n">cost_a</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> 
+    <span class="n">cost_b</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span>
+    <span class="n">seed</span><span class="o">=</span><span class="mi">42</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># 3. Serialize to disk for reproducible benchmarking</span>
+<span class="n">output_filename</span> <span class="o">=</span> <span class="s2">&quot;data/spread_full.mcfmin&quot;</span>
+<span class="n">s2mflow</span><span class="o">.</span><span class="n">save_multi_commodity_instance</span><span class="p">(</span><span class="n">output_filename</span><span class="p">,</span> <span class="n">network</span><span class="p">,</span> <span class="n">mc_data</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Successfully generated and saved to </span><span class="si">{</span><span class="n">output_filename</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+<span class="c1"># 4. Verify serialization by loading the instance back into memory</span>
+<span class="n">loaded_mc_data</span> <span class="o">=</span> <span class="n">s2mflow</span><span class="o">.</span><span class="n">load_multi_commodity_instance</span><span class="p">(</span><span class="n">output_filename</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loaded </span><span class="si">{</span><span class="n">loaded_mc_data</span><span class="o">.</span><span class="n">num_commodities</span><span class="si">}</span><span class="s2"> commodities from disk.&quot;</span><span class="p">)</span>
+
+</pre></div>
+</div>
+</section>
+<section id="file-based-parsing-with-pyomo-highs-open-source">
+<h2>2. File-Based Parsing with Pyomo &amp; HiGHS (Open-Source)<a class="headerlink" href="#file-based-parsing-with-pyomo-highs-open-source" title="Link to this heading"></a></h2>
+<p>This workflow loads a serialized <code class="docutils literal notranslate"><span class="pre">.mcfmin</span></code> file from disk, builds a mathematical program using the Pyomo algebraic modeling language, and solves it using the open-source HiGHS solver.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">pyomo.environ</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pyo</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">s2mflow</span>
+
+<span class="c1"># 1. Load multi-commodity benchmark instance</span>
+<span class="n">mc</span> <span class="o">=</span> <span class="n">s2mflow</span><span class="o">.</span><span class="n">load_multi_commodity_instance</span><span class="p">(</span><span class="s2">&quot;data/spread_full.mcfmin&quot;</span><span class="p">)</span>
+
+<span class="c1"># 2. Initialize Model</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">pyo</span><span class="o">.</span><span class="n">ConcreteModel</span><span class="p">(</span><span class="s2">&quot;MCMCF_Model&quot;</span><span class="p">)</span>
+
+<span class="c1"># 3. Decision Variables: 0 &lt;= x_e^k &lt;= u_e^k</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">commodity_edge_bounds</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">k</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+    <span class="n">upper_bound</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">commodity_capacities</span><span class="p">[(</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">)][</span><span class="n">k</span><span class="p">]</span>
+    <span class="k">return</span> <span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="nb">float</span><span class="p">(</span><span class="n">upper_bound</span><span class="p">))</span>
+
+<span class="n">model</span><span class="o">.</span><span class="n">flow</span> <span class="o">=</span> <span class="n">pyo</span><span class="o">.</span><span class="n">Var</span><span class="p">(</span>
+    <span class="n">mc</span><span class="o">.</span><span class="n">commodity_edges</span><span class="p">,</span>
+    <span class="n">domain</span><span class="o">=</span><span class="n">pyo</span><span class="o">.</span><span class="n">NonNegativeReals</span><span class="p">,</span>
+    <span class="n">bounds</span><span class="o">=</span><span class="n">commodity_edge_bounds</span><span class="p">,</span>
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;x&quot;</span>
+<span class="p">)</span>
+
+<span class="c1"># 4. Objective: Minimize total routing cost</span>
+<span class="n">model</span><span class="o">.</span><span class="n">obj</span> <span class="o">=</span> <span class="n">pyo</span><span class="o">.</span><span class="n">Objective</span><span class="p">(</span>
+    <span class="n">expr</span><span class="o">=</span><span class="nb">sum</span><span class="p">(</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">flow</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">]</span> <span class="o">*</span> <span class="n">mc</span><span class="o">.</span><span class="n">commodity_weights</span><span class="p">[(</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">)][</span><span class="n">k</span><span class="p">]</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">mc</span><span class="o">.</span><span class="n">commodity_edges</span>
+    <span class="p">),</span>
+    <span class="n">sense</span><span class="o">=</span><span class="n">pyo</span><span class="o">.</span><span class="n">minimize</span>
+<span class="p">)</span>
+
+<span class="c1"># 5. Shared Mutual Capacity Constraints</span>
+<span class="n">model</span><span class="o">.</span><span class="n">shared_caps</span> <span class="o">=</span> <span class="n">pyo</span><span class="o">.</span><span class="n">ConstraintList</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">edge</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">mc</span><span class="o">.</span><span class="n">edges</span><span class="p">):</span>
+    <span class="n">u</span><span class="p">,</span> <span class="n">v</span> <span class="o">=</span> <span class="n">edge</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">edge</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">model</span><span class="o">.</span><span class="n">shared_caps</span><span class="o">.</span><span class="n">add</span><span class="p">(</span>
+        <span class="nb">sum</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">flow</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">mc</span><span class="o">.</span><span class="n">num_commodities</span><span class="p">))</span> <span class="o">&lt;=</span> <span class="n">mc</span><span class="o">.</span><span class="n">capacities</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="p">)</span>
+
+<span class="c1"># 6. Flow Conservation Constraints</span>
+<span class="n">model</span><span class="o">.</span><span class="n">flow_balance</span> <span class="o">=</span> <span class="n">pyo</span><span class="o">.</span><span class="n">ConstraintList</span><span class="p">()</span>
+<span class="n">incoming</span><span class="p">,</span> <span class="n">outgoing</span> <span class="o">=</span> <span class="n">s2mflow</span><span class="o">.</span><span class="n">get_adjacency_mapping</span><span class="p">(</span><span class="n">mc</span><span class="o">.</span><span class="n">nodes</span><span class="p">,</span> <span class="n">mc</span><span class="o">.</span><span class="n">edges</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">mc</span><span class="o">.</span><span class="n">num_commodities</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">mc</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
+        <span class="n">in_flow</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">flow</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">node</span><span class="p">]</span> <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">incoming</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="p">[]))</span>
+        <span class="n">out_flow</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">flow</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">v</span><span class="p">]</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">outgoing</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="p">[]))</span>
+        
+        <span class="n">demand</span> <span class="o">=</span> <span class="n">mc</span><span class="o">.</span><span class="n">commodity_supply_demand_data</span><span class="p">[</span><span class="n">node</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="k">if</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">mc</span><span class="o">.</span><span class="n">commodity_supply_demand_data</span> <span class="k">else</span> <span class="mf">0.0</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">flow_balance</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">out_flow</span> <span class="o">-</span> <span class="n">in_flow</span> <span class="o">==</span> <span class="n">demand</span><span class="p">)</span>
+
+<span class="c1"># 7. Solve</span>
+<span class="n">solver</span> <span class="o">=</span> <span class="n">pyo</span><span class="o">.</span><span class="n">SolverFactory</span><span class="p">(</span><span class="s2">&quot;highs&quot;</span><span class="p">)</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">solver</span><span class="o">.</span><span class="n">solve</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">tee</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[+] Optimal Objective Value: </span><span class="si">{</span><span class="n">pyo</span><span class="o">.</span><span class="n">value</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">obj</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+</pre></div>
+</div>
+</section>
+<section id="in-memory-generation-with-gurobi-commercial-solver">
+<h2>3. In-Memory Generation with Gurobi (Commercial Solver)<a class="headerlink" href="#in-memory-generation-with-gurobi-commercial-solver" title="Link to this heading"></a></h2>
+<p>For researchers solving large-scale programs, <code class="docutils literal notranslate"><span class="pre">s2mflow</span></code> interfaces smoothly with the <code class="docutils literal notranslate"><span class="pre">gurobipy</span></code> API for the commercial solver Gurobi. This example bypasses file serialization entirely, generating the multicommodity partitions dynamically in-memory and passing them directly to the solver matrix.</p>
+<p><em>(Note: Executing this script for large instances requires a valid Gurobi license).</em></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">gurobipy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">grb</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">s2mflow</span>
+
+<span class="c1"># 1. Load baseline and generate data in-memory</span>
+<span class="n">net</span> <span class="o">=</span> <span class="n">s2mflow</span><span class="o">.</span><span class="n">load_min_instance</span><span class="p">(</span><span class="s2">&quot;data/input.min&quot;</span><span class="p">)</span>
+<span class="n">mc_data</span> <span class="o">=</span> <span class="n">s2mflow</span><span class="o">.</span><span class="n">generate_multi_commodity_data</span><span class="p">(</span><span class="n">net</span><span class="p">,</span> <span class="n">num_commodities</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span> <span class="n">is_uniform</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">seed</span><span class="o">=</span><span class="mi">512</span><span class="p">)</span>
+
+<span class="c1"># 2. Initialize Gurobi Model</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">grb</span><span class="o">.</span><span class="n">Model</span><span class="p">(</span><span class="s2">&quot;MCMCF_InMemory&quot;</span><span class="p">)</span>
+
+<span class="c1"># 3. Decision Variables</span>
+<span class="n">upper_bounds</span> <span class="o">=</span> <span class="p">[</span><span class="n">mc_data</span><span class="o">.</span><span class="n">commodity_capacities</span><span class="p">[(</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">)][</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">mc_data</span><span class="o">.</span><span class="n">commodity_edges</span><span class="p">]</span>
+<span class="n">flow</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">addVars</span><span class="p">(</span>
+    <span class="n">mc_data</span><span class="o">.</span><span class="n">commodity_edges</span><span class="p">,</span> 
+    <span class="n">lb</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> 
+    <span class="n">ub</span><span class="o">=</span><span class="n">upper_bounds</span><span class="p">,</span> 
+    <span class="n">vtype</span><span class="o">=</span><span class="n">grb</span><span class="o">.</span><span class="n">GRB</span><span class="o">.</span><span class="n">CONTINUOUS</span><span class="p">,</span> 
+    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;x&quot;</span>
+<span class="p">)</span>
+
+<span class="c1"># 4. Objective Function</span>
+<span class="n">model</span><span class="o">.</span><span class="n">setObjective</span><span class="p">(</span>
+    <span class="n">grb</span><span class="o">.</span><span class="n">quicksum</span><span class="p">(</span><span class="n">flow</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">]</span> <span class="o">*</span> <span class="n">mc_data</span><span class="o">.</span><span class="n">commodity_weights</span><span class="p">[(</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">)][</span><span class="n">k</span><span class="p">]</span> <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">mc_data</span><span class="o">.</span><span class="n">commodity_edges</span><span class="p">),</span>
+    <span class="n">sense</span><span class="o">=</span><span class="n">grb</span><span class="o">.</span><span class="n">GRB</span><span class="o">.</span><span class="n">MINIMIZE</span>
+<span class="p">)</span>
+
+<span class="c1"># 5. Shared Mutual Capacity Constraints</span>
+<span class="n">model</span><span class="o">.</span><span class="n">addConstrs</span><span class="p">(</span>
+    <span class="p">(</span>
+        <span class="n">grb</span><span class="o">.</span><span class="n">quicksum</span><span class="p">(</span><span class="n">flow</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">]</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">mc_data</span><span class="o">.</span><span class="n">num_commodities</span><span class="p">))</span> <span class="o">&lt;=</span> <span class="n">net</span><span class="o">.</span><span class="n">capacities</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">u</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">arcs</span><span class="p">)</span>
+    <span class="p">),</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Shared_Cap&quot;</span>
+<span class="p">)</span>
+
+<span class="c1"># 6. Flow Conservation Constraints</span>
+<span class="n">incoming</span><span class="p">,</span> <span class="n">outgoing</span> <span class="o">=</span> <span class="n">s2mflow</span><span class="o">.</span><span class="n">get_adjacency_mapping</span><span class="p">(</span><span class="n">net</span><span class="o">.</span><span class="n">nodes</span><span class="p">,</span> <span class="n">net</span><span class="o">.</span><span class="n">arcs</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">mc_data</span><span class="o">.</span><span class="n">num_commodities</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">net</span><span class="o">.</span><span class="n">nodes</span><span class="p">:</span>
+        <span class="n">in_flow</span> <span class="o">=</span> <span class="n">grb</span><span class="o">.</span><span class="n">quicksum</span><span class="p">(</span><span class="n">flow</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">u</span><span class="p">,</span> <span class="n">node</span><span class="p">]</span> <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">incoming</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="p">[]))</span>
+        <span class="n">out_flow</span> <span class="o">=</span> <span class="n">grb</span><span class="o">.</span><span class="n">quicksum</span><span class="p">(</span><span class="n">flow</span><span class="p">[</span><span class="n">k</span><span class="p">,</span> <span class="n">node</span><span class="p">,</span> <span class="n">v</span><span class="p">]</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">outgoing</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="p">[]))</span>
+        
+        <span class="n">demand</span> <span class="o">=</span> <span class="n">mc_data</span><span class="o">.</span><span class="n">supply_partition</span><span class="p">[</span><span class="n">node</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="k">if</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">mc_data</span><span class="o">.</span><span class="n">supply_partition</span> <span class="k">else</span> <span class="mf">0.0</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">addConstr</span><span class="p">(</span>
+            <span class="n">out_flow</span> <span class="o">-</span> <span class="n">in_flow</span> <span class="o">==</span> <span class="n">demand</span><span class="p">,</span> 
+            <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;balance_</span><span class="si">{</span><span class="n">k</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="n">node</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+<span class="c1"># 7. Solve</span>
+<span class="n">model</span><span class="o">.</span><span class="n">optimize</span><span class="p">()</span>
+<span class="k">if</span> <span class="n">model</span><span class="o">.</span><span class="n">Status</span> <span class="o">==</span> <span class="n">grb</span><span class="o">.</span><span class="n">GRB</span><span class="o">.</span><span class="n">OPTIMAL</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[+] Optimal Objective Value: </span><span class="si">{</span><span class="n">model</span><span class="o">.</span><span class="n">ObjVal</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="s2mflow: Multicommodity Flow Instance Generator" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="format.html" class="btn btn-neutral float-right" title="The .mcfmin Data Format" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Felix P. Broesamle, Stefan Nickel.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

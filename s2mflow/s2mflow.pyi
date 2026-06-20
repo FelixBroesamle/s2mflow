@@ -1,6 +1,7 @@
 from typing import Dict, List, Tuple
 
 class Edge:
+    """Represents a single directed edge within the network."""
     tail: int
     head: int
     low: int
@@ -8,6 +9,7 @@ class Edge:
     cost: int
 
 class NetworkInstance:
+    """A parsed single-commodity network instance loaded from a DIMACS .min file."""
     num_nodes: int
     num_arcs: int
     nodes: List[int]
@@ -18,9 +20,11 @@ class NetworkInstance:
     weights: List[int]
 
 class MultiCommoditySupplies:
+    """Contains the partitioned supply/demand data across multiple commodities."""
     partition: Dict[int, List[int]]
 
 class MultiCommodityData:
+    """The generated multicommodity data structure, lifting the base network into K dimensions."""
     supply_partition: Dict[int, List[int]]
     is_uniform: bool
     commodity_edges: List[Tuple[int, int, int]]
@@ -36,6 +40,7 @@ class MultiCommodityData:
     seed: int
 
 class ParsedMulticommodityInstance:
+    """An object containing multi-commodity data parsed directly from a serialized .mcfmin file."""
     num_nodes: int
     num_arcs: int
     num_commodities: int

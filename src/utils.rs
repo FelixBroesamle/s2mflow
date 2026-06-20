@@ -212,7 +212,6 @@ pub fn parse_multi_min(path: &str) -> Result<ParsedMulticommodityInstance, Box<d
         commodity_capacities: commodity_capacities,
         commodity_weights: commodity_weights,
         commodity_edges: commodity_edges,
-        commodity_bundle_capacities: commodity_bundle_capacities,
         start_nodes: start_nodes, 
         end_nodes: end_nodes, 
         is_uniform: is_uniform,

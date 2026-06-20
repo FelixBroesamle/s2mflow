@@ -65,7 +65,6 @@ pub struct ParsedMulticommodityInstance {
     #[pyo3(get)] pub commodity_capacities: BTreeMap<(i64, i64), Vec<i64>>,
     #[pyo3(get)] pub commodity_weights: BTreeMap<(i64, i64), Vec<i64>>,
     #[pyo3(get)] pub commodity_edges: Vec<(usize, i64, i64)>,
-    #[pyo3(get)] pub commodity_bundle_capacities: Vec<i64>,
     #[pyo3(get)] pub start_nodes: Vec<i64>,
     #[pyo3(get)] pub end_nodes: Vec<i64>,
     #[pyo3(get)] pub is_uniform: bool,

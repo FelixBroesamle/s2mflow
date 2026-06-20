@@ -53,6 +53,32 @@ To run the below mathematical modeling examples included in this repository out-
 poetry install --extras solver
 ```
 
+### Verifying the Installation
+
+After building from source, you can verify that both the Rust core and the Python bindings are functioning correctly by running the test suites:
+
+```bash
+# Run the Rust test-suite
+cargo test
+
+# Run the Python test suite
+poetry run pytest
+# To run the Python tests in parallel, use:
+poetry run pytest -n auto
+```
+
+### Running the Example Workflows
+
+The repository includes demo scripts and datasets to help you verify the end-to-end workflow after installation. Sample network instances are provided in the `data/` directory. Example scripts are locatet in the `examples` directory.
+
+```bash
+# Execute the core s2mflow multicommodity instance generation workflow
+poetry run python examples/demo.py
+
+# Execute the downstream Pyomo optimization workflow
+poetry run python examples/solve_instance_pyomo.py
+```
+
 ## Quick Start
 
 The following snippet illustrates an end-to-end workflow: parsing a standard single-commodity DIMACS `.min` network file, lifting it into a 3-commodity space with high commodity-demand heterogeneity (`Spread`), and exporting the output. It also demonstrates how to bypass file formats entirely for direct integration.
@@ -218,8 +244,7 @@ model.obj = pyo.Objective(
 
 # 5. Shared Mutual Capacity Constraints
 model.shared_caps = pyo.ConstraintList()
-for i, edge in enumerate(mc.edges):
-    u, v = edge[0], edge[1]
+for i, (u, v) in enumerate(mc.edges):
     model.shared_caps.add(
         sum(model.flow[k, u, v] for k in range(mc.num_commodities)) <= mc.capacities[i]
     )

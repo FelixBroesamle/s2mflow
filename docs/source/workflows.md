@@ -77,8 +77,7 @@ model.obj = pyo.Objective(
 
 # 5. Shared Mutual Capacity Constraints
 model.shared_caps = pyo.ConstraintList()
-for i, edge in enumerate(mc.edges):
-    u, v = edge[0], edge[1]
+for i, (u, v) in enumerate(mc.edges):
     model.shared_caps.add(
         sum(model.flow[k, u, v] for k in range(mc.num_commodities)) <= mc.capacities[i]
     )

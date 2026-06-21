@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this
 
+## [0.1.20] - 2026-06-21
+### Added
+- Added end-to-end optimization workflows (`examples/solve_instance_pyomo.py` and `examples/solve_instance_gurobi.py`).
+
+### Changed
+- Expanded `readthedocs` documentation with comprehensive API references, setup guide, and workflows.
+- Extended `README.md` with setup guide, workflows, and scalability benchmark results.
+
 ## [0.1.19] - 2026-05-26
 ### Changed
 - Changed method to `get_adjacency_mapping`.

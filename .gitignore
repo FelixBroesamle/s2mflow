@@ -23,3 +23,6 @@ dist/
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
+
+# data
+data/netgen_sr_*

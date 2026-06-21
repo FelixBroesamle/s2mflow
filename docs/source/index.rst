@@ -7,25 +7,59 @@ Welcome to the official documentation for **s2mflow**.
 This library provides a high-performance tool for generating 
 multicommodity flow instances from single-commodity flow instances.
 
-.. toctree::
-   :maxdepth: 2
-   :caption: Contents:
-
 Introduction
 ------------
 `s2mflow` bridges the gap between theoretical multicommodity flow research and practical
 optimization by providing a robust generator implemented in Rust with a seamless Python
 interface via PyO3.
 
-API Reference
--------------
-This section is automatically generated from the source code docstrings.
+Installation
+------------
 
-.. automodule:: s2mflow
-   :members:
-   :undoc-members:
-   :show-inheritance:
-   :inherited-members:
+`s2mflow` can be installed across different environments depending on whether you are using the pre-compiled package or building from source.
+
+**Standard Python Installation**
+
+You can install `s2mflow` directly via `pip` (or `poetry`):
+
+.. code-block:: bash
+   
+   pip install s2mflow
+   # Or using Poetry
+   poetry add s2mflow
+
+**Building from Source**
+
+If you want to build `s2mflow` from source, ensure you have the Rust toolchain installed, then run:
+
+.. code-block:: bash
+
+   git clone https://github.com/FelixBroesamle/s2mflow.git
+   cd s2mflow
+   poetry install -vvv
+   poetry run maturin develop --release
+
+**Running Mathematical Models**
+
+To run the mathematical modeling examples, install the optional solver dependencies:
+
+.. code-block:: bash
+
+   poetry install --extras solver
+
+
+.. toctree::
+   :maxdepth: 2
+   :caption: User Guide:
+
+   workflows
+   format
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Developer Guide:
+
+   api
 
 Indices and tables
 ==================

@@ -1,0 +1,285 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The .mcfmin Data Format &mdash; s2mflow 0.1.20 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=17aaaefc"></script>
+      <script src="_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="API Reference" href="api.html" />
+    <link rel="prev" title="End-to-End Optimization Workflows" href="workflows.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            s2mflow
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">User Guide:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="workflows.html">End-to-End Optimization Workflows</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">The .mcfmin Data Format</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#file-structure-overview">File Structure Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#the-problem-line">1. The Problem Line</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#the-node-line">2. The Node Line</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#the-arc-line">3. The Arc Line</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#examples-for-the-mcfmin-format">Examples for the .mcfmin Format</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#based-single-commodity-instance-input-min">Based Single-Commodity Instance (input.min)</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#strategy-1-uniform-partitioning">Strategy 1: Uniform Partitioning</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#strategy-2-spread-partitioning-with-randomized-capacities">Strategy 2: Spread Partitioning with Randomized Capacities</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#strategy-3-spread-partitioning-with-randomized-costs">Strategy 3: Spread Partitioning with Randomized Costs</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#strategy-4-spread-partitioning-with-randomized-capacities-and-costs">Strategy 4: Spread Partitioning with Randomized Capacities and Costs</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Developer Guide:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#classes">Classes</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html#functions">Functions</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">s2mflow</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">The .mcfmin Data Format</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/format.md.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="the-mcfmin-data-format">
+<h1>The .mcfmin Data Format<a class="headerlink" href="#the-mcfmin-data-format" title="Link to this heading"></a></h1>
+<p>The <code class="docutils literal notranslate"><span class="pre">s2mflow</span></code> library introduces a clean, structured text standard that extends the classic DIMACS minimum-cost flow format to natively capture multicommodity properties, such as commodity-specific bounds, supply/demand splits, and variable cost structures.</p>
+<section id="file-structure-overview">
+<h2>File Structure Overview<a class="headerlink" href="#file-structure-overview" title="Link to this heading"></a></h2>
+<p>An <code class="docutils literal notranslate"><span class="pre">.mcfmin</span></code> file consists of three types of lines:</p>
+<ul class="simple">
+<li><p><strong>Problem Line (<code class="docutils literal notranslate"><span class="pre">p</span></code>)</strong>: Defines the network dimensions and randomization flags.</p></li>
+<li><p><strong>Node Line (<code class="docutils literal notranslate"><span class="pre">n</span></code>)</strong>: Defines supply/demand and how it is partitioned across commodities.</p></li>
+<li><p><strong>Arc Line (<code class="docutils literal notranslate"><span class="pre">a</span></code>)</strong>: Defines the edges, capacities, and costs. The structure of this line changes dynamically based on the flags set in the problem line.</p></li>
+</ul>
+</section>
+<hr class="docutils" />
+<section id="the-problem-line">
+<h2>1. The Problem Line<a class="headerlink" href="#the-problem-line" title="Link to this heading"></a></h2>
+<p><strong>Syntax:</strong> <code class="docutils literal notranslate"><span class="pre">p</span> <span class="pre">min</span> <span class="pre">&lt;num_nodes&gt;</span> <span class="pre">&lt;num_edges&gt;</span> <span class="pre">&lt;num_commodities&gt;</span> <span class="pre">&lt;randomize_caps&gt;</span> <span class="pre">&lt;randomize_costs&gt;</span> <span class="pre">&lt;is_uniform&gt;</span> <span class="pre">&lt;seed&gt;</span></code></p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">randomize_caps</span></code> (0 or 1): Flag indicating if commodity-specific capacities are used.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">randomize_costs</span></code> (0 or 1): Flag indicating if commodity-specific costs are used.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">is_uniform</span></code> (0 or 1): Flag indicating if the uniform partitioning method was used.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">seed</span></code> (Integer): The random seed used. Relevant if <code class="docutils literal notranslate"><span class="pre">is_uniform</span> <span class="pre">=</span> <span class="pre">0</span></code> (Spread method) or if randomization flags are set to <code class="docutils literal notranslate"><span class="pre">1</span></code>. Defaults to <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p></li>
+</ul>
+</section>
+<section id="the-node-line">
+<h2>2. The Node Line<a class="headerlink" href="#the-node-line" title="Link to this heading"></a></h2>
+<p><strong>Syntax:</strong> <code class="docutils literal notranslate"><span class="pre">n</span> <span class="pre">&lt;node_id&gt;</span> <span class="pre">&lt;total_demand&gt;</span> <span class="pre">&lt;demand_com_1&gt;</span> <span class="pre">&lt;demand_com_2&gt;</span> <span class="pre">...</span> <span class="pre">&lt;demand_com_K&gt;</span></code></p>
+<p>This line explicitly lists how the <code class="docutils literal notranslate"><span class="pre">total_demand</span></code> of the baseline single-commodity node is partitioned into individual supplies/demands for all $K$ commodities.</p>
+</section>
+<section id="the-arc-line">
+<h2>3. The Arc Line<a class="headerlink" href="#the-arc-line" title="Link to this heading"></a></h2>
+<p>The length of the arc line expands dynamically depending on the randomization flags:</p>
+<ul class="simple">
+<li><p><strong>Default (<code class="docutils literal notranslate"><span class="pre">0</span></code>, <code class="docutils literal notranslate"><span class="pre">0</span></code>):</strong> <code class="docutils literal notranslate"><span class="pre">a</span> <span class="pre">&lt;from&gt;</span> <span class="pre">&lt;to&gt;</span> <span class="pre">&lt;low&gt;</span> <span class="pre">&lt;cap_total&gt;</span> <span class="pre">&lt;cap_total&gt;</span> <span class="pre">&lt;cost&gt;</span></code></p></li>
+<li><p><strong>Commodity-specific capacities (<code class="docutils literal notranslate"><span class="pre">1</span></code>, <code class="docutils literal notranslate"><span class="pre">0</span></code>):</strong> <code class="docutils literal notranslate"><span class="pre">a</span> <span class="pre">&lt;from&gt;</span> <span class="pre">&lt;to&gt;</span> <span class="pre">&lt;low&gt;</span> <span class="pre">&lt;cap_total&gt;</span> <span class="pre">&lt;cap_1&gt;</span> <span class="pre">...</span> <span class="pre">&lt;cap_K&gt;</span> <span class="pre">&lt;cost&gt;</span></code></p></li>
+<li><p><strong>Commodity-specific costs (<code class="docutils literal notranslate"><span class="pre">0</span></code>, <code class="docutils literal notranslate"><span class="pre">1</span></code>):</strong> <code class="docutils literal notranslate"><span class="pre">a</span> <span class="pre">&lt;from&gt;</span> <span class="pre">&lt;to&gt;</span> <span class="pre">&lt;low&gt;</span> <span class="pre">&lt;cap_total&gt;</span> <span class="pre">&lt;cap_total&gt;</span> <span class="pre">&lt;cost_1&gt;</span> <span class="pre">...</span> <span class="pre">&lt;cost_K&gt;</span></code></p></li>
+<li><p><strong>Fully Randomized (<code class="docutils literal notranslate"><span class="pre">1</span></code>, <code class="docutils literal notranslate"><span class="pre">1</span></code>):</strong> <code class="docutils literal notranslate"><span class="pre">a</span> <span class="pre">&lt;from&gt;</span> <span class="pre">&lt;to&gt;</span> <span class="pre">&lt;low&gt;</span> <span class="pre">&lt;cap_total&gt;</span> <span class="pre">&lt;cap_1&gt;</span> <span class="pre">...</span> <span class="pre">&lt;cap_K&gt;</span> <span class="pre">&lt;cost_1&gt;</span> <span class="pre">...</span> <span class="pre">&lt;cost_K&gt;</span></code></p></li>
+</ul>
+<section id="examples-for-the-mcfmin-format">
+<h3>Examples for the .mcfmin Format<a class="headerlink" href="#examples-for-the-mcfmin-format" title="Link to this heading"></a></h3>
+<p>Below, we illustrate how the file structure shifts when applying different generation configurations.</p>
+<section id="based-single-commodity-instance-input-min">
+<h4>Based Single-Commodity Instance (input.min)<a class="headerlink" href="#based-single-commodity-instance-input-min" title="Link to this heading"></a></h4>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># c Base single-commodity instance (input.min)</span>
+<span class="c1"># p min 4 5</span>
+<span class="c1"># n 1 17</span>
+<span class="c1"># n 4 -17</span>
+<span class="c1"># a 1 2 0 10 10</span>
+<span class="c1"># a 1 3 0 15 5</span>
+<span class="c1"># a 2 4 0 10 10</span>
+<span class="c1"># a 3 2 0 5 20</span>
+<span class="c1"># a 3 4 0 15 4</span>
+</pre></div>
+</div>
+</section>
+<section id="strategy-1-uniform-partitioning">
+<h4>Strategy 1: Uniform Partitioning<a class="headerlink" href="#strategy-1-uniform-partitioning" title="Link to this heading"></a></h4>
+<p>This strategy distributes the nodal demands as evenly as possible across the 4 commodities.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">uniform_mc_data</span> <span class="o">=</span> <span class="n">s2mflow</span><span class="o">.</span><span class="n">generate_multi_commodity_data</span><span class="p">(</span><span class="n">instance</span><span class="o">=</span><span class="n">network</span><span class="p">,</span> <span class="n">num_commodities</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">is_uniform</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">randomize_caps</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">randomize_costs</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="n">s2mflow</span><span class="o">.</span><span class="n">save_multi_commodity_instance</span><span class="p">(</span><span class="s2">&quot;uniform.mcfmin&quot;</span><span class="p">,</span> <span class="n">network</span><span class="p">,</span> <span class="n">uniform_mc_data</span><span class="p">)</span>
+
+<span class="c1"># --- Output File Contents (uniform.mcfmin) ---</span>
+<span class="c1"># c Multicommodity flow generated by s2mflow</span>
+<span class="c1"># p min 4 5 4 0 0 1 0</span>
+<span class="c1"># n 1 17 5 4 4 4</span>
+<span class="c1"># n 4 -17 -5 -4 -4 -4</span>
+<span class="c1"># a 1 2 0 10 10 10</span>
+<span class="c1"># a 1 3 0 15 15 5</span>
+<span class="c1"># a 2 4 0 10 10 10</span>
+<span class="c1"># a 3 2 0 5 5 20</span>
+<span class="c1"># a 3 4 0 15 15 4</span>
+</pre></div>
+</div>
+</section>
+<section id="strategy-2-spread-partitioning-with-randomized-capacities">
+<h4>Strategy 2: Spread Partitioning with Randomized Capacities<a class="headerlink" href="#strategy-2-spread-partitioning-with-randomized-capacities" title="Link to this heading"></a></h4>
+<p>This strategy generates high commodity-demand heterogeneity and applies unfirom noise to individual commodity capacities.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 2. Spread partitioning, randomized capacities</span>
+<span class="n">spread_rand_caps_mc_data</span> <span class="o">=</span> <span class="n">s2mflow</span><span class="o">.</span><span class="n">generate_multi_commodity_data</span><span class="p">(</span>
+<span class="n">instance</span><span class="o">=</span><span class="n">network</span><span class="p">,</span>
+<span class="n">num_commodities</span><span class="o">=</span><span class="n">NUM_COMMODITIES</span><span class="p">,</span>
+<span class="n">is_uniform</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="n">randomize_caps</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="n">cap_a</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span>
+<span class="n">cap_b</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+<span class="n">randomize_costs</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="n">seed</span><span class="o">=</span><span class="mi">42</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="c1">#--- Output file contents--</span>
+<span class="c1"># c Multicommodity flow generated by s2mflow</span>
+<span class="c1"># p min 4 5 4 1 0 0 42</span>
+<span class="c1"># n 1 17 4 6 1 6</span>
+<span class="c1"># n 4-17-4-6-1-6</span>
+<span class="c1"># a 1 2 0 10 9 9 9 8 10</span>
+<span class="c1"># a 1 3 0 15 10 12 14 15 5</span>
+<span class="c1"># a 2 4 0 10 7 7 10 9 10</span>
+<span class="c1"># a 3 2 0 5 4 4 5 4 20</span>
+<span class="c1"># a 3 4 0 15 10 13 10 13 4</span>
+</pre></div>
+</div>
+</section>
+<section id="strategy-3-spread-partitioning-with-randomized-costs">
+<h4>Strategy 3: Spread Partitioning with Randomized Costs<a class="headerlink" href="#strategy-3-spread-partitioning-with-randomized-costs" title="Link to this heading"></a></h4>
+<p>This strategy generates high commodity-demand heterogeneity and applies unfirom noise to individual commodity costs.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># 2. Spread partitioning, randomized costs</span>
+<span class="n">spread_rand_costs_mc_data</span> <span class="o">=</span> <span class="n">s2mflow</span><span class="o">.</span><span class="n">generate_multi_commodity_data</span><span class="p">(</span>
+    <span class="n">instance</span><span class="o">=</span><span class="n">network</span><span class="p">,</span>
+    <span class="n">num_commodities</span><span class="o">=</span><span class="n">NUM_COMMODITIES</span><span class="p">,</span>
+    <span class="n">is_uniform</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">randomize_caps</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">randomize_costs</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">cost_a</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span>
+    <span class="n">cost_b</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span>
+    <span class="n">seed</span><span class="o">=</span><span class="mi">42</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="c1">#--- Output file contents--</span>
+<span class="c1"># c Multicommodity flow generated by s2mflow</span>
+<span class="c1"># p min 4 5 4 0 1 0 42</span>
+<span class="c1"># n 1 17 4 6 1 6</span>
+<span class="c1"># n 4-17-4-6-1-6</span>
+<span class="c1"># a 1 2 0 10 10 13 14 15 12</span>
+<span class="c1"># a 1 3 0 15 15 3 6 9 9</span>
+<span class="c1"># a 2 4 0 10 10 7 6 19 13</span>
+<span class="c1"># a 3 2 0 5 5 22 15 26 17</span>
+<span class="c1"># a 3 4 0 15 15 3 6 3 6</span>
+</pre></div>
+</div>
+</section>
+<section id="strategy-4-spread-partitioning-with-randomized-capacities-and-costs">
+<h4>Strategy 4: Spread Partitioning with Randomized Capacities and Costs<a class="headerlink" href="#strategy-4-spread-partitioning-with-randomized-capacities-and-costs" title="Link to this heading"></a></h4>
+<p>This strategy generates high commodity-demand heterogeneity and simultaneously applies uniform noise to individual commodity capacities and arc costs.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">spread_rand_caps_costs_mc_data</span> <span class="o">=</span> <span class="n">s2mflow</span><span class="o">.</span><span class="n">generate_multi_commodity_data</span><span class="p">(</span>
+    <span class="n">instance</span><span class="o">=</span><span class="n">network</span><span class="p">,</span> <span class="n">num_commodities</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">is_uniform</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">randomize_caps</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cap_a</span><span class="o">=</span><span class="mf">0.6</span><span class="p">,</span> <span class="n">cap_b</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span>
+    <span class="n">randomize_costs</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cost_a</span><span class="o">=</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">cost_b</span><span class="o">=</span><span class="mf">2.0</span><span class="p">,</span>
+    <span class="n">seed</span><span class="o">=</span><span class="mi">42</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">s2mflow</span><span class="o">.</span><span class="n">save_multi_commodity_instance</span><span class="p">(</span><span class="s2">&quot;spread_full.mcfmin&quot;</span><span class="p">,</span> <span class="n">network</span><span class="p">,</span> <span class="n">spread_rand_caps_costs_mc_data</span><span class="p">)</span>
+
+<span class="c1"># --- Output File Contents (spread_full.mcfmin) ---</span>
+<span class="c1"># c Multicommodity flow generated by s2mflow</span>
+<span class="c1"># p min 4 5 4 1 1 0 42</span>
+<span class="c1"># n 1 17 4 6 1 6</span>
+<span class="c1"># n 4 -17 -4 -6 -1 -6</span>
+<span class="c1"># a 1 2 0 10 9 8 8 10 13 15 6 17</span>
+<span class="c1"># a 1 3 0 15 10 13 10 11 4 10 6 7</span>
+<span class="c1"># a 2 4 0 10 9 9 8 7 6 6 18 13</span>
+<span class="c1"># a 3 2 0 5 4 4 5 5 21 34 23 23</span>
+<span class="c1"># a 3 4 0 15 15 11 12 12 8 6 6 3</span>
+</pre></div>
+</div>
+<p>(For demonstrations of isolated randomization configurations, see the <code class="docutils literal notranslate"><span class="pre">examples/demo.py</span></code> file).</p>
+</section>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="workflows.html" class="btn btn-neutral float-left" title="End-to-End Optimization Workflows" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="api.html" class="btn btn-neutral float-right" title="API Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Felix P. Broesamle, Stefan Nickel.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

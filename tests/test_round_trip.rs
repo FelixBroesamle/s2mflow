@@ -103,7 +103,7 @@ fn test_round_trip() {
                                 let arc_key = (edge.tail, edge.head);
 
                                 let loaded_cap = loaded.commodity_capacities.get(&arc_key).expect(&format!("Arc key weight missing: {:?}", arc_key));
-                                assert_eq!(loaded_cap, &generated.capacites_by_arc[&i]);
+                                assert_eq!(loaded_cap, &generated.capacities_by_arc[&i]);
 
                                 let loaded_weight = loaded.commodity_weights.get(&arc_key).expect(&format!("Arc key wieght missing: {:?}", arc_key));
                                 assert_eq!(loaded_weight, &generated.weights_by_arc[&i]);

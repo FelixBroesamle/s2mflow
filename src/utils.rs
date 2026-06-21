@@ -97,6 +97,7 @@ pub fn parse_multi_min(path: &str) -> Result<ParsedMulticommodityInstance, Box<d
     let mut nodes = Vec::new();
     let mut node_seen = BTreeSet::new();
     let mut edges = Vec::new();
+    let mut supplies = BTreeMap::new();
     let mut commodity_supply_demand_data = BTreeMap::new();
     let mut capacities = Vec::new();
     let mut commodity_capacities = BTreeMap::new();
@@ -134,8 +135,12 @@ pub fn parse_multi_min(path: &str) -> Result<ParsedMulticommodityInstance, Box<d
 
             "n" => {
                 let node_id: i64 = tokens[1].parse::<i64>()?;
+                
+                let supply_val: i64 = tokens[2].parse::<i64>()?;
 
                 let supply_vals: Vec<i64> = tokens[3..].iter().map(|&t| t.parse::<i64>()).collect::<Result<Vec<_>, _>>()?;
+
+                supplies.insert(node_id, supply_val);
 
                 commodity_supply_demand_data.insert(node_id, supply_vals);
 
@@ -207,12 +212,12 @@ pub fn parse_multi_min(path: &str) -> Result<ParsedMulticommodityInstance, Box<d
         randomized_weights: rand_costs, 
         nodes: nodes, 
         edges: edges, 
+        supplies: supplies,
         commodity_supply_demand_data: commodity_supply_demand_data, 
         capacities: capacities, 
         commodity_capacities: commodity_capacities,
         commodity_weights: commodity_weights,
         commodity_edges: commodity_edges,
-        commodity_bundle_capacities: commodity_bundle_capacities,
         start_nodes: start_nodes, 
         end_nodes: end_nodes, 
         is_uniform: is_uniform,
@@ -265,7 +270,7 @@ pub fn export_to_dimacs(
 
     // 4. Arc Lines: a <tail> <head> <low> <upp> <cost_c1> <cost_c2> ...
     for (i, edge) in instance.edges.iter().enumerate() {
-        let caps = &multi_data.capacites_by_arc[&i];
+        let caps = &multi_data.capacities_by_arc[&i];
         let costs = &multi_data.weights_by_arc[&i];
 
         let caps_to_write = if multi_data.randomized_capacities { caps.as_slice() } else { &caps[0..1] };

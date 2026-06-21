@@ -176,6 +176,8 @@ pub fn generate_multi_commodity_data(
 
     let mut weights_by_arc = BTreeMap::new();
     let mut capacities_by_arc = BTreeMap::new();
+    let mut commodity_capacities = BTreeMap::new();
+    let mut commodity_weights = BTreeMap::new();
     let mut commodity_edges = Vec::with_capacity(num_commodities * num_original_edges);
     let mut base_capacities = Vec::with_capacity(num_commodities * num_original_edges);
 
@@ -211,24 +213,32 @@ pub fn generate_multi_commodity_data(
             };
             arc_caps.push(cap);
         }
-        weights_by_arc.insert(i, arc_costs);
-        capacities_by_arc.insert(i, arc_caps);
+
+        let arc_key = (edge.tail, edge.head);
+        weights_by_arc.insert(i, arc_costs.clone());
+        capacities_by_arc.insert(i, arc_caps.clone());
+        commodity_weights.insert(arc_key, arc_costs);
+        commodity_capacities.insert(arc_key, arc_caps);
     }
 
-    let mut commodity_weights = Vec::with_capacity(num_commodities);
+
+
+    let mut weight = Vec::with_capacity(num_commodities);
     for k in 0..num_commodities {
         let w: Vec<i64> = (0..num_original_edges).map(|i| weights_by_arc[&i][k]).collect();
-        commodity_weights.push(w);
+        weight.push(w);
     }
 
     MultiCommodityData { 
         supply_partition,
         is_uniform: is_uniform, 
-        edges: commodity_edges, 
+        commodity_edges: commodity_edges, 
         capacities: base_capacities, 
-        weight: commodity_weights, 
+        weight: weight, 
         weights_by_arc, 
-        capacites_by_arc: capacities_by_arc, 
+        capacities_by_arc: capacities_by_arc, 
+        commodity_capacities: commodity_capacities,
+        commodity_weights: commodity_weights,
         num_commodities, 
         randomized_capacities: randomize_caps, 
         randomized_weights: randomize_costs, 

@@ -1,6 +1,7 @@
 from typing import Dict, List, Tuple
 
 class Edge:
+    """Represents a single directed edge within the network."""
     tail: int
     head: int
     low: int
@@ -8,6 +9,7 @@ class Edge:
     cost: int
 
 class NetworkInstance:
+    """A parsed single-commodity network instance loaded from a DIMACS .min file."""
     num_nodes: int
     num_arcs: int
     nodes: List[int]
@@ -18,22 +20,27 @@ class NetworkInstance:
     weights: List[int]
 
 class MultiCommoditySupplies:
+    """Contains the partitioned supply/demand data across multiple commodities."""
     partition: Dict[int, List[int]]
 
 class MultiCommodityData:
+    """The generated multicommodity data structure, lifting the base network into K dimensions."""
     supply_partition: Dict[int, List[int]]
     is_uniform: bool
-    edges: List[Tuple[int, int, int]]
+    commodity_edges: List[Tuple[int, int, int]]
     capacities: List[int]
     weight: List[List[int]]
     weights_by_arc: Dict[int, List[int]]
-    capacites_by_arc: Dict[int, List[int]]
+    capacities_by_arc: Dict[int, List[int]]
+    commodity_capacities: Dict[Tuple[int, int], List[int]]
+    commodity_weights: Dict[Tuple[int, int], List[int]]
     num_commodities: int
     randomized_capacities: bool
     randomized_weights: bool
     seed: int
 
 class ParsedMulticommodityInstance:
+    """An object containing multi-commodity data parsed directly from a serialized .mcfmin file."""
     num_nodes: int
     num_arcs: int
     num_commodities: int
@@ -41,6 +48,7 @@ class ParsedMulticommodityInstance:
     randomized_weights: bool
     nodes: List[int]
     edges: List[Tuple[int, int]]
+    supplies: Dict[int, int]
     commodity_supply_demand_data: Dict[int, List[int]]
     capacities: List[int]
     commodity_capacities: Dict[Tuple[int, int], List[int]]

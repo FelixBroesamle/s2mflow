@@ -9,7 +9,7 @@
 project = 's2mflow'
 copyright = '2026, Felix P. Broesamle, Stefan Nickel'
 author = 'Felix P. Broesamle, Stefan Nickel'
-release = '0.1.19'
+release = '0.1.20'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration

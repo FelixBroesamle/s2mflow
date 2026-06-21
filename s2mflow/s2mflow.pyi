@@ -48,6 +48,7 @@ class ParsedMulticommodityInstance:
     randomized_weights: bool
     nodes: List[int]
     edges: List[Tuple[int, int]]
+    supplies: Dict[int, int]
     commodity_supply_demand_data: Dict[int, List[int]]
     capacities: List[int]
     commodity_capacities: Dict[Tuple[int, int], List[int]]

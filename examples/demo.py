@@ -112,7 +112,6 @@ if __name__ == "__main__":
 
     loaded_spread_mc_rand_caps_costs_data = s2mflow.load_multi_commodity_instance(output_path)
 
-    
     data = {1: 126, 2: -126}
     print(data)
 

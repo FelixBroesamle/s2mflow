@@ -219,7 +219,7 @@ import s2mflow
 mc = s2mflow.load_multi_commodity_instance("spread_full.mcfmin")
 
 # 2. Initialize Model
-model = pyo.ConcreteModel("MCMCF_Model")
+model = pyo.ConcreteModel("MCMCF")
 
 # 3. Decision Variables: 0 <= x_e^k <= u_e^k
 def commodity_edge_bounds(m, k, u, v):
@@ -282,7 +282,7 @@ net = s2mflow.load_min_instance("input.min")
 mc_data = s2mflow.generate_multi_commodity_data(net, num_commodities=3, is_uniform=False, seed=512)
 
 # 2. Initialize Gurobi Model
-model = grb.Model("MCMCF_InMemory")
+model = grb.Model("MCMCF")
 
 # 3. Decision Variables
 upper_bounds = [mc_data.commodity_capacities[(u, v)][k] for (k, u, v) in mc_data.commodity_edges]

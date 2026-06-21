@@ -60,6 +60,7 @@ pub struct ParsedMulticommodityInstance {
     #[pyo3(get)] pub randomized_weights: bool,
     #[pyo3(get)] pub nodes: Vec<i64>,
     #[pyo3(get)] pub edges: Vec<(i64, i64)>,
+    #[pyo3(get)] pub supplies: BTreeMap<i64, i64>,
     #[pyo3(get)] pub commodity_supply_demand_data: BTreeMap<i64, Vec<i64>>,
     #[pyo3(get)] pub capacities: Vec<i64>,
     #[pyo3(get)] pub commodity_capacities: BTreeMap<(i64, i64), Vec<i64>>,

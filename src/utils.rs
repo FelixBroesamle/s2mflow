@@ -97,6 +97,7 @@ pub fn parse_multi_min(path: &str) -> Result<ParsedMulticommodityInstance, Box<d
     let mut nodes = Vec::new();
     let mut node_seen = BTreeSet::new();
     let mut edges = Vec::new();
+    let mut supplies = BTreeMap::new();
     let mut commodity_supply_demand_data = BTreeMap::new();
     let mut capacities = Vec::new();
     let mut commodity_capacities = BTreeMap::new();
@@ -134,8 +135,12 @@ pub fn parse_multi_min(path: &str) -> Result<ParsedMulticommodityInstance, Box<d
 
             "n" => {
                 let node_id: i64 = tokens[1].parse::<i64>()?;
+                
+                let supply_val: i64 = tokens[2].parse::<i64>()?;
 
                 let supply_vals: Vec<i64> = tokens[3..].iter().map(|&t| t.parse::<i64>()).collect::<Result<Vec<_>, _>>()?;
+
+                supplies.insert(node_id, supply_val);
 
                 commodity_supply_demand_data.insert(node_id, supply_vals);
 
@@ -207,6 +212,7 @@ pub fn parse_multi_min(path: &str) -> Result<ParsedMulticommodityInstance, Box<d
         randomized_weights: rand_costs, 
         nodes: nodes, 
         edges: edges, 
+        supplies: supplies,
         commodity_supply_demand_data: commodity_supply_demand_data, 
         capacities: capacities, 
         commodity_capacities: commodity_capacities,

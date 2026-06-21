@@ -16,7 +16,7 @@ interface via PyO3.
 Installation
 ------------
 
-`s2mflow` can be installed across different environment depending on whether you are using the pre-compiled package or building from source.
+`s2mflow` can be installed across different environments depending on whether you are using the pre-compiled package or building from source.
 
 **Standard Python Installation**
 
@@ -38,6 +38,15 @@ If you want to build `s2mflow` from source, ensure you have the Rust toolchain i
    cd s2mflow
    poetry install -vvv
    poetry run maturin develop --release
+
+**Running Mathematical Models**
+
+To run the mathematical modeling examples, install the optional solver dependencies:
+
+.. code-block:: bash
+
+   poetry install --extras solver
+
 
 .. toctree::
    :maxdepth: 2

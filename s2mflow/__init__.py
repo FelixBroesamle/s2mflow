@@ -75,6 +75,7 @@ Attributes:
     randomized_weights (bool): Flag indicating the presence of commodity-specific routing costs.
     nodes (List[int]): List of all node IDs.
     edges (List[Tuple[int, int]]): List of baseline (tail, head) edges.
+    supplies (Dict[int, int]): Node IDs mapped to their total supply/demand.
     commodity_supply_demand_data (Dict[int, List[int]]): Node IDs mapped to their respective supply/demand arrays across commodities.
     capacities (List[int]): Shared mutual capacities of the dges.
     commodity_capacities (Dict[Tuple[int, int], List[int]]): Commodity-specific capacities keyed by (tail, head).

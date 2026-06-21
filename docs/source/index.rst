@@ -16,7 +16,7 @@ interface via PyO3.
 Installation
 ------------
 
-`s2mflow` can be installed across different environment depending on whether you are using the pre-compiled package or building from source.
+`s2mflow` can be installed across different environments depending on whether you are using the pre-compiled package or building from source.
 
 **Standard Python Installation**
 

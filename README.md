@@ -75,7 +75,7 @@ The repository includes demo scripts and datasets to help you verify the end-to-
 # Execute the core s2mflow multicommodity instance generation workflow
 poetry run python examples/demo.py
 
-# Execute the downstream Pyomo optimization workflow
+# Execute the below Pyomo + HiGHS optimization workflow
 poetry run python examples/solve_instance_pyomo.py
 ```
 

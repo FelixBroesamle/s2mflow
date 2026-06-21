@@ -1,6 +1,6 @@
 [package]
 name = "s2mflow"
-version = "0.1.20"
+version = "0.1.21"
 edition = "2024"
 description = "Meta-generator: generating multicommodity flow instances from single-commodity flow instances."
 

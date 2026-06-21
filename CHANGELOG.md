@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this
 
+## [0.1.21] - 2026-06-21
+### Changed
+- Minor fix in `README.md`.
+
 ## [0.1.20] - 2026-06-21
 ### Added
 - Added end-to-end optimization workflows (`examples/solve_instance_pyomo.py` and `examples/solve_instance_gurobi.py`).

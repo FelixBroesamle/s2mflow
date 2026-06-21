@@ -382,7 +382,7 @@ The following benchmarks were executed on an Intel Core Ultra 7 255U (32 GB RAM)
 | `netgen_sr_14a` | 16,384 | 2,097,152 | 30 | 128 | 128 | 128,000.0 | 0.8777 | 13.9071 / 15.4077 | 1.1207 / 6.2683 | 2.3871 / 4.6295 | 18.2926 / 27.1831 |
 | `netgen_sr_14a` | 16,384 | 2,097,152 | 50 | 128 | 128 | 128,000.0 | 0.8777 | 20.8690 / **24.6117** | 1.1872 / 10.1748 | 2.7607 / 7.7355 | 25.6946 / **43.3997** |
 
-*Note: In the largest randomized case (`netgen_sr_14a`, $K=50$), the Rust engine generates over 104 million independent random parameters. The generation phase remains highly performant (+3.7 seconds), while the total pipeline time increases primarily due to the physical disk I/O required to write and load the expanded (full) `.mcfmin` file. All benchmark instances and generation configurations are available in the [LEMON Graph Library](https://lemon.cs.elte.hu/trac/lemon/wiki/MinCostFlowData).**
+*Note: In the largest randomized case (`netgen_sr_14a`, $K=50$), the Rust engine generates over 104 million independent random parameters. The generation phase remains highly performant (+3.7 seconds), while the total pipeline time increases primarily due to the physical disk I/O required to write and load the expanded (full) `.mcfmin` file. All benchmark instances and generation configurations are available in the [LEMON Graph Library](https://lemon.cs.elte.hu/trac/lemon/wiki/MinCostFlowData).*
 
 ## Citing
 

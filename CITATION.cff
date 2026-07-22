@@ -20,7 +20,26 @@ preferred-citation:
     - family-names: "Nickel"
       given-names: "Stefan"
       affiliation: "Discrete Optimization and Logistics, Institute for Operations Research, Karlsruhe Institute of Technology"
-  title: "On the Single-Multi-Commodity Gap: Lifting Single- to Multicommodity Flow Instances"
+  title: "s2mflow: A meta-generator for multicommodity flow instances"
+  journal: "SoftwareX"
+  volume: 35
+  pages: "102874"
   year: 2026
-  journal: "Optimization Online (Preprint)"
-  url: "https://optimization-online.org/?p=34287"
+  issn: "2352-7110"
+  doi: "10.1016/j.softx.2026.102874"
+  url: "https://doi.org/10.1016/j.softx.2026.102874"
+
+references:
+  - type: article
+    authors:
+      - family-names: "Broesamle"
+        given-names: "Felix P."
+        affiliation: "Discrete Optimization and Logistics, Institute for Operations Research, Karlsruhe Institute of Technology"
+      - family-names: "Nickel"
+        given-names: "Stefan"
+        affiliation: "Discrete Optimization and Logistics, Institute for Operations Research, Karlsruhe Institute of Technology"
+    title: "On the Single-Multi-Commodity Gap: Lifting Single- to Multicommodity Flow Instances"
+    year: 2026
+    journal: "Optimization Online"
+    notes: "Preprint"
+    url: "https://optimization-online.org/?p=34287"

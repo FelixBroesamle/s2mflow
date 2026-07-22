@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this
 
+## [0.1.22] - 2026-07-11
+### Changed
+- Updated `CITATION.cff` and `README.md` with *SoftwareX* publication details.
+
 ## [0.1.21] - 2026-06-21
 ### Changed
 - Minor fix in `README.md`.

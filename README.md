@@ -393,7 +393,7 @@ The following benchmarks were executed on an Intel Core Ultra 7 255U (32 GB RAM)
 
 If you use `s2mflow` in your research, please use the following preferred citation:
 ```text
-@article{BROESAMLE2026102874,
+@article{BroesamleNickel:s2mflow,
   title   = {s2mflow: A meta-generator for multicommodity flow instances},
   author  = {Broesamle, Felix P. and Nickel, Stefan},
   journal = {SoftwareX},

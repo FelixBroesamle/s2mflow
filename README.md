@@ -11,7 +11,12 @@
 
 `s2mflow` is a Python library [PyPI](https://pypi.org/project/s2mflow/) with a high-speed Rust core (via PyO3) designed to transform single-commodity minimum-cost flow (MCF) instances into minimum-cost multicommodity flow (MCMCF) instances. It is built for researchers in Operations Research, Mathematical Optimization, and Network Optimization who need to generate reproducible, scalable test data.
 
-`s2mflow` implements and extends the meta-generation framework introduced in:
+The software package `s2mflow` is presented in [SoftwareX](https://www.sciencedirect.com/science/article/pii/S2352711026003651):
+```text
+Felix P. Broesamle, Stefan Nickel, s2mflow: A meta-generator for multicommodity flow instances, SoftwareX, Volume 35, 2026, 102874, ISSN 2352-7110, https://doi.org/10.1016/j.softx.2026.102874.
+```
+
+The theoretical meta-generation framework and mathematical foundations are introduced in:
 ```text
 Felix P. Broesamle and Stefan Nickel. 2026. "On the Single-Multi-Commodity Gap: Lifting Single- to Multicommodity Flow Instances". Optimization Online. Preprint. Available at https://optimization-online.org/?p=34287.
 ```
@@ -386,25 +391,29 @@ The following benchmarks were executed on an Intel Core Ultra 7 255U (32 GB RAM)
 
 ## Citing
 
-If you use `s2mflow` in your research, please use the following preferred citation for the framework:
+If you use `s2mflow` in your research, please use the following preferred citation:
 ```text
-@misc{BroesamleNickel:SMCG,
-    author = {Broesamle, Felix P. and Nickel, Stefan},
-    title = {On the Single-Multi-Commodity Gap: Lifting Single- to Multicommodity Flow Instances},
-    year = {2026},
-    howpublished = {Optimization Online},
-    note = {Preprint. Available at \url{https://optimization-online.org/?p=34287}},
-    url = {https://optimization-online.org/?p=34287},
+@article{BROESAMLE2026102874,
+  title   = {s2mflow: A meta-generator for multicommodity flow instances},
+  author  = {Broesamle, Felix P. and Nickel, Stefan},
+  journal = {SoftwareX},
+  volume  = {35},
+  pages   = {102874},
+  year    = {2026},
+  issn    = {2352-7110},
+  doi     = {10.1016/j.softx.2026.102874},
+  url     = {https://doi.org/10.1016/j.softx.2026.102874}
 }
 ```
 
-To cite `s2mflow` specifically in your research, please cite the software:
+If you refer to the meta-generation framework and mathematical foundations, please cite the following paper:
 ```text
-@software{s2mflow2026,
-  author = {Broesamle, Felix P. and Nickel, Stefan},
-  title = {s2mflow: A Meta-generator for Multicommodity Flow Instances},
-  year = {2026},
-  url = {https://github.com/FelixBroesamle/s2mflow}
+@misc{BroesamleNickel:SMCG,
+  author       = {Broesamle, Felix P. and Nickel, Stefan},
+  title        = {On the Single-Multi-Commodity Gap: Lifting Single- to Multicommodity Flow Instances},
+  year         = {2026},
+  howpublished = {Optimization Online},
+  note         = {Preprint. Available at https://optimization-online.org/?p=34287.},
 }
 ```
 

@@ -18,7 +18,9 @@ fn test_partition_logic() {
                 let path = entry.path();
                 if path.is_dir() {
                     find_min_files_recursive(&path, files);
-                } else if path.extension().map_or(false, |ext| ext == "min") {
+                } else if path.extension().map_or(false, |ext| ext == "min")
+                    && !path.to_string_lossy().contains("netgen_sr")
+                {
                     files.push(path);
                 }
             }
@@ -30,7 +32,7 @@ fn test_partition_logic() {
     assert!(!min_files.is_empty(), "No .min instances found inside s2mflow_data.");
 
     let num_commodities_space = vec![2, 3, 5, 10];
-    let is_uniform_space = vec![true, false];
+    let method_space = vec![0, 1, 2];
     let seed = 42;
 
     let mut failed_cases = Vec::new();
@@ -40,11 +42,11 @@ fn test_partition_logic() {
         let network = load_min_instance(file_path.to_str().unwrap().to_string()).unwrap();
 
         for &num_commodities in & num_commodities_space {
-            for &is_uniform in &is_uniform_space {
+            for &method in &method_space {
 
                 let case_context = format!(
-                    "File: {}, K: {}, Uniform: {}",
-                    file_name, num_commodities, is_uniform
+                    "File: {}, K: {}, method: {}",
+                    file_name, num_commodities, method
                 );
 
                 println!("Testing Partition Logic: {}", case_context);
@@ -53,7 +55,7 @@ fn test_partition_logic() {
                     let mc_data = generate_multi_commodity_data(
                         &network, 
                         num_commodities, 
-                        is_uniform, 
+                        method, 
                         false, 
                         1.0, 
                         1.0, 

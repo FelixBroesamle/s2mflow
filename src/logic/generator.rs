@@ -1,9 +1,35 @@
+use core::panic;
 use std::collections::BTreeMap;
 use rand::prelude::*;
 use rand::{SeedableRng};
 use rand::rngs::StdRng;
+use rand_distr::{Beta, Binomial, Distribution};
 
 use crate::models::MultiCommodityData;
+
+
+/// Sample a single value from a Beta-Binomial(n, alpha, beta) distribution.
+/// 
+/// The distribution is generated hierarchically:
+///     1. Draw p ~ Beta(alpha, beta)
+///     2. Draw X ~ Binomial(n, p)
+fn sample_beta_binomial(
+    rng: &mut StdRng,
+    n: i64,
+    alpha: f64,
+    beta: f64,
+) -> i64 {
+    if n == 0 {
+        return 0;
+    }
+
+    let beta_dist = Beta::new(alpha, beta).unwrap();
+    let p: f64 = beta_dist.sample(rng);
+    
+    let binom_dist = Binomial::new(n as u64, p).unwrap();
+    binom_dist.sample(rng) as i64
+}
+
 
 pub fn split_supply_and_demand_uniform(
     data: &BTreeMap<i64, i64>,
@@ -69,6 +95,50 @@ pub fn split_supply_and_demand_spread(
 
         commodity_data.insert(node, sample);
 
+    }
+
+    balance_commodities(&mut commodity_data, data, num_commodities);
+
+    commodity_data
+}
+
+
+pub fn split_supply_and_demand_beta_binomial(
+    data: &BTreeMap<i64, i64>,
+    num_commodities: usize,
+    seed: u64,
+) -> BTreeMap<i64, Vec<i64>> {
+    let mut rng = StdRng::seed_from_u64(seed);
+    let mut commodity_data: BTreeMap<i64, Vec<i64>> = BTreeMap::new();
+
+    for (&node, &demand) in data {
+        if demand == 0 { continue; }
+
+        let abs_demand = demand.abs();
+        let mut remaining = abs_demand;
+        let mut sample = vec![0i64; num_commodities];
+
+        for j in 0..(num_commodities - 1) {
+            let x = sample_beta_binomial(
+                &mut rng,
+                remaining,
+                1.0,
+                (num_commodities - j) as f64,
+            );
+            
+            sample[j] = x;
+            remaining -= x;
+        }
+
+        sample[num_commodities - 1] = remaining;
+
+        if demand < 0 {
+            for val in sample.iter_mut() {
+                *val = -(*val);
+            }
+        }
+
+        commodity_data.insert(node, sample);
     }
 
     balance_commodities(&mut commodity_data, data, num_commodities);
@@ -156,7 +226,7 @@ fn balance_commodities(
 pub fn generate_multi_commodity_data(
     instance: &crate::models::NetworkInstance,
     num_commodities: usize,
-    is_uniform: bool,
+    method: i64,
     randomize_caps: bool,
     cap_a: f64,
     cap_b: f64,
@@ -165,13 +235,15 @@ pub fn generate_multi_commodity_data(
     cost_b: f64,
     seed: u64,
 ) -> MultiCommodityData {
-    let supply_partition = if is_uniform {
-        split_supply_and_demand_uniform(&instance.supplies, num_commodities)
-    } else {
-        split_supply_and_demand_spread(&instance.supplies, num_commodities, seed)
+    let mut rng = StdRng::seed_from_u64(seed);
+
+    let supply_partition = match method {
+        0 => split_supply_and_demand_spread(&instance.supplies, num_commodities, seed),
+        1 => split_supply_and_demand_uniform(&instance.supplies, num_commodities),
+        2 => split_supply_and_demand_beta_binomial(&instance.supplies, num_commodities, seed),
+        _ => panic!("Unknown partitioning method: {}", method),
     };
 
-    let mut rng = StdRng::seed_from_u64(seed);
     let num_original_edges = instance.edges.len();
 
     let mut weights_by_arc = BTreeMap::new();
@@ -231,7 +303,7 @@ pub fn generate_multi_commodity_data(
 
     MultiCommodityData { 
         supply_partition,
-        is_uniform: is_uniform, 
+        method,
         commodity_edges: commodity_edges, 
         capacities: base_capacities, 
         weight: weight, 
@@ -250,17 +322,18 @@ pub fn generate_multi_commodity_data(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::collections::BTreeMap;
+    use std::{assert_eq, collections::BTreeMap, println};
 
     /// Test Phase 1: Local Partitioning (Node-wise Split)
     /// Goal: Ensure the sum of partitioned commodities at a node matches the original node supply.
     #[test]
     fn test_local_partitioning() {
         let mut supplies = BTreeMap::new();
-        supplies.insert(1, 10);
-        supplies.insert(2, -10);
+        supplies.insert(1, 25);
+        supplies.insert(2, -25);
 
         let num_commodities = 3;
+        let seed = 42;
         
         // Test Uniform
         let res_uniform = split_supply_and_demand_uniform(&supplies, num_commodities);
@@ -283,7 +356,8 @@ mod tests {
         }
 
         // Test Spread
-        let res_spread = split_supply_and_demand_spread(&supplies, num_commodities, 42);
+        let res_spread = split_supply_and_demand_spread(&supplies, num_commodities, seed);
+
         for (&node, &original_val) in &supplies {
             let partition = &res_spread[&node];
             
@@ -299,7 +373,26 @@ mod tests {
                     assert!(val <= 0, "Node {} is demand (<0) but has positive commodity value {}", node, val);
                 }
             }
+        }
 
+        // Test Beta-Binomial
+        let res_beta_binomial = split_supply_and_demand_beta_binomial(&supplies, num_commodities, seed);
+
+        for (&node, &original_val) in &supplies {
+            let partition = &res_beta_binomial[&node];
+
+            // Check sum
+            let partition_sum: i64 = partition.iter().sum();
+            assert_eq!(partition_sum, original_val);
+
+            // Check Sign Consistency
+            for &val in partition {
+                if original_val > 0 {
+                    assert!(val >= 0, "Node {} is supply (>0) but has negative commodity value {}", node, val);
+                } else if original_val < 0 {
+                    assert!(val <= 0, "Node {} is demand (<0) but has positive commodity value {}", node, val);
+                }
+            }
         }
     }
 

@@ -92,7 +92,7 @@ pub fn parse_multi_min(path: &str) -> Result<ParsedMulticommodityInstance, Box<d
     let mut rand_caps = false;
     let mut rand_costs = false;
     let mut seed = 0;
-    let mut is_uniform = false;
+    let mut method: i64 = 0;
 
     let mut nodes = Vec::new();
     let mut node_seen = BTreeSet::new();
@@ -125,7 +125,7 @@ pub fn parse_multi_min(path: &str) -> Result<ParsedMulticommodityInstance, Box<d
 
                 rand_caps = tokens.get(5).map_or(Ok(0), |t| t.parse::<i64>())? != 0;
                 rand_costs = tokens.get(6).map_or(Ok(0), |t| t.parse::<i64>())? != 0;
-                is_uniform = tokens.get(7).map_or(Ok(0), |t| t.parse::<i64>())? != 0;
+                method = tokens.get(7).map_or(Ok(0), |t| t.parse::<i64>())?;
 
                 edges.reserve(num_arcs as usize);
                 capacities.reserve(num_arcs as usize);
@@ -220,7 +220,7 @@ pub fn parse_multi_min(path: &str) -> Result<ParsedMulticommodityInstance, Box<d
         commodity_edges: commodity_edges,
         start_nodes: start_nodes, 
         end_nodes: end_nodes, 
-        is_uniform: is_uniform,
+        method: method,
         seed: seed,
     })
 }
@@ -233,9 +233,7 @@ pub fn export_to_dimacs(
     let file = File::create(path)?;
     let mut writer = BufWriter::new(file);
 
-    let is_uniform_int = if multi_data.is_uniform { 1 } else { 0 };
-
-    let write_seed = if multi_data.is_uniform && !multi_data.randomized_capacities && !multi_data.randomized_weights {
+    let write_seed = if multi_data.method == 1 && !multi_data.randomized_capacities && !multi_data.randomized_weights {
         0
     } else {
         multi_data.seed
@@ -257,7 +255,7 @@ pub fn export_to_dimacs(
         multi_data.num_commodities,
         rand_caps_int,
         rand_costs_int,
-        is_uniform_int,
+        multi_data.method,
         write_seed,
     )?;
 

@@ -26,7 +26,7 @@ class MultiCommoditySupplies:
 class MultiCommodityData:
     """The generated multicommodity data structure, lifting the base network into K dimensions."""
     supply_partition: Dict[int, List[int]]
-    is_uniform: bool
+    method: int
     commodity_edges: List[Tuple[int, int, int]]
     capacities: List[int]
     weight: List[List[int]]
@@ -57,7 +57,7 @@ class ParsedMulticommodityInstance:
     commodity_bundle_capacities: List[int]
     start_nodes: List[int]
     end_nodes: List[int]
-    is_uniform: bool
+    method: int
     seed: int
 
 def load_min_instance(path: str) -> NetworkInstance:
@@ -99,10 +99,23 @@ def split_supplies_spread(data: Dict[int, int], num_commodities: int, seed: int)
     """
     ...
 
+def split_supplies_beta_binomial(data: Dict[int, int], num_commodities: int, seed: int) -> Dict[int, List[int]]:
+    """Partitions nodal supply/demand into K commodities using a beta-binomial distribution.
+    
+    Args:
+        data (Dict[int, int]): A mapping of node IDs to their total supply/demand.
+        num_commodities (int): The number of commodities.ä
+        seed (int): Seed.
+
+    Return:
+        Dict[int, List[int]]: A mapping where each node ID points to a list of the commodity supplies/demands.
+    """
+    ...
+
 def generate_multi_commodity_data(
     instance: NetworkInstance,
     num_commodities: int,
-    is_uniform: bool,
+    method: int,
     randomize_caps: bool = False,
     cap_a: float = 0.8,
     cap_b: float = 1.0,
@@ -119,7 +132,7 @@ def generate_multi_commodity_data(
     Args:
         instance (NetworkInstance): The base single-commodity network.
         num_commodities (int): The number of commodities.
-        is_uniform (bool): If True, uses uniform partitioning; otherwise, uses spread.
+        method (int): Partitioning method. 0 = Spread, 1 = Uniform, 2 = Beta-Binomial.
         randomize_caps (bool, optional): If True, varies capacities per commodity. Defaults to False.
         cap_a (float, optional): Lower multiplier for capacity randomization. Defaults to 0.8.
         cap_b (float, optional): Upper multiplier for capacity randomization. Defaults to 1.2.

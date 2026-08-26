@@ -62,7 +62,7 @@ pub fn split_supply_and_demand_uniform(
         commodity_data.insert(node, node_data);
     }
 
-    balance_commodities(&mut commodity_data, data, num_commodities);
+    balance_commodities(&mut commodity_data, data, num_commodities, None);
 
     commodity_data
 }
@@ -100,7 +100,7 @@ pub fn split_supply_and_demand_spread(
 
     }
 
-    balance_commodities(&mut commodity_data, data, num_commodities);
+    balance_commodities(&mut commodity_data, data, num_commodities, Some(&mut rng));
 
     commodity_data
 }
@@ -144,7 +144,7 @@ pub fn split_supply_and_demand_beta_binomial(
         commodity_data.insert(node, sample);
     }
 
-    balance_commodities(&mut commodity_data, data, num_commodities);
+    balance_commodities(&mut commodity_data, data, num_commodities, Some(&mut rng));
 
     commodity_data
 }
@@ -212,7 +212,8 @@ pub fn compute_commodity_demand_heterogeneity(
 fn balance_commodities(
     commodity_data: &mut BTreeMap<i64, Vec<i64>>,
     original_data: &BTreeMap<i64, i64>,
-    num_commodities: usize
+    num_commodities: usize,
+    mut rng: Option<&mut StdRng>,
 ) {
     // 1. Compute current global balances
     let mut current_balances = vec![0i64; num_commodities];
@@ -242,7 +243,13 @@ fn balance_commodities(
 
         if surplus_ks.is_empty() || deficit_ks.is_empty() { break; }
 
-        let sk = surplus_ks[0];  // Take the first surplus commodity to balance
+        let sk = match rng.as_deref_mut() {
+            Some(r) => {
+                let idx = r.random_range(0..surplus_ks.len());
+                surplus_ks[idx]
+            }
+            None => surplus_ks[0]
+        };  // Pick surplus commodity randomly for spread and beta-binomial, take the first surplus commodity for uniform
        
         if deficit_ptr >= deficit_ks.len() {
             deficit_ptr = 0;
@@ -472,7 +479,7 @@ mod tests {
         let original_data = BTreeMap::from([(1, 13), (2, 2), (3, 5), (4, -6), (5, -14)]);
         let num_commodities = 3;
 
-        balance_commodities(&mut commodity_data, &original_data, num_commodities);
+        balance_commodities(&mut commodity_data, &original_data, num_commodities, None);
 
         // Verify Global Balance: sum_i(b_i^k) == 0
         for k in 0..num_commodities {

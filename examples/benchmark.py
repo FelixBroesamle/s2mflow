@@ -21,12 +21,14 @@ def run_benchmark():
     # Define our two experimental cases
     CONFIGS = {
         "Std": {
-            "is_uniform": False,
+            # "is_uniform": False,      version 0.1.22
+            "method": 0,
             "randomize_caps": False,
             "randomize_costs": False,
         },
         "Rand": {
-            "is_uniform": False,
+            # "is_uniform": False,      version 0.1.22
+            "method": 0,
             "randomize_caps": True,
             "cap_a": 0.8,
             "cap_b": 1.0,

@@ -19,7 +19,7 @@ network = s2mflow.load_min_instance("data/input.min")
 mc_data = s2mflow.generate_multi_commodity_data(
     instance=network,
     num_commodities=4,
-    is_uniform=False,       # Activates stochastic Spread partitioning
+    method=0,       # Activates stochastic Spread partitioning
     randomize_caps=True, 
     cap_a=0.6, 
     cap_b=1.0,
@@ -113,7 +113,7 @@ import s2mflow
 
 # 1. Load baseline and generate data in-memory
 net = s2mflow.load_min_instance("data/input.min")
-mc_data = s2mflow.generate_multi_commodity_data(net, num_commodities=3, is_uniform=False, seed=512)
+mc_data = s2mflow.generate_multi_commodity_data(net, num_commodities=3, method=0, seed=512)
 
 # 2. Initialize Gurobi Model
 model = grb.Model("MCMCF")

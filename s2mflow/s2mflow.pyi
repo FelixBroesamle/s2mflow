@@ -112,6 +112,18 @@ def split_supplies_beta_binomial(data: Dict[int, int], num_commodities: int, see
     """
     ...
 
+def compute_commodity_demand_heterogeneity(partition: Dict[int, List[int]], original: Dict[int, int]) -> float:
+    """Computes the commodity-demand heterogeneity H(B) of a given partition.
+
+    Args: 
+        partition (Dict[int, List[int]): Mapping from node ID to commodity demands.
+        original (Dict[int, int]): Original single-commodity demands.
+    
+    Returns:
+        float: Commodity-demand heterogeneity in [0,1].
+    """
+    ...
+
 def generate_multi_commodity_data(
     instance: NetworkInstance,
     num_commodities: int,

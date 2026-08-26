@@ -1,8 +1,11 @@
 use core::panic;
 use std::collections::BTreeMap;
+use std::println;
 use rand::prelude::*;
 use rand::{SeedableRng};
 use rand::rngs::StdRng;
+use rand_distr::num_traits::abs;
+use rand_distr::num_traits::ops::inv;
 use rand_distr::{Beta, Binomial, Distribution};
 
 use crate::models::MultiCommodityData;
@@ -144,6 +147,65 @@ pub fn split_supply_and_demand_beta_binomial(
     balance_commodities(&mut commodity_data, data, num_commodities);
 
     commodity_data
+}
+
+
+pub fn compute_commodity_demand_heterogeneity(
+    partition: &BTreeMap<i64, Vec<i64>>,
+    original: &BTreeMap<i64, i64>,
+) -> f64 {
+    if partition.is_empty() || original.is_empty() {
+        return 0.0;
+    }
+
+    // Determine number of commodities from the first non-zero entry
+    let mut k = 1usize;
+    for vals in partition.values() {
+        if !vals.is_empty() {
+            k = vals.len();
+            break;
+        }
+    }
+
+    if k == 1 {
+        return 0.0
+    }
+
+    let mut active_nodes = 0usize;
+    let mut total_heterogeneity = 0.0;
+
+    for (&node, &total_demand) in original {
+
+        if total_demand == 0 {
+            continue;
+        }
+
+        let node_partition = match partition.get(&node) {
+            Some(vals) => vals,
+            None => continue,
+        };
+
+        let abs_demand = (total_demand.abs()) as f64;
+        let inv_k = 1.0 / (k as f64);
+        let mut node_deviation = 0.0;
+
+        for  &val in node_partition {
+            let p = (val.abs() as f64) / abs_demand;
+            node_deviation += (p - inv_k).abs();
+        }
+
+        // Normalize total variation distance to [0,1]
+        let node_heterogeneity = (k as f64) / (2.0 * ((k - 1) as f64)) * node_deviation;
+
+        total_heterogeneity += node_heterogeneity;
+        active_nodes += 1;
+    }
+
+    if active_nodes == 0 {
+        0.0
+    } else {
+        total_heterogeneity / (active_nodes as f64)
+    }
 }
 
 
@@ -436,6 +498,30 @@ mod tests {
             }
         }
 
+    }
+
+    /// Test: Commodity-demand heterogeneity.
+    #[test]
+    fn test_heterogeneity_bounds() {
+        let mut original = BTreeMap::new();
+        original.insert(1, 9);
+        original.insert(2, -9);
+
+        // Uniform partition for K = 3: [3,3,3] and [-3,-3,-3]
+        let mut uniform_partition = BTreeMap::new();
+        uniform_partition.insert(1, vec![3, 3, 3]);
+        uniform_partition.insert(2, vec![-3, -3, -3]);
+
+        let h_uniform = compute_commodity_demand_heterogeneity(&uniform_partition, &original);
+        assert!(h_uniform <= 0.000001 && h_uniform >= -0.000001);
+
+        // Spread-like extreme partition for K = 3: [9,0,0] and [-9,0,0]
+        let mut spread_partition = BTreeMap::new();
+        spread_partition.insert(1, vec![9,0,0]);
+        spread_partition.insert(2, vec![-9,0,0]);
+
+        let h_spread = compute_commodity_demand_heterogeneity(&spread_partition, &original);
+        assert!(h_spread <= 1.000001 && h_spread >= 0.999999)
     }
 
 }

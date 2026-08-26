@@ -93,6 +93,29 @@ pub fn split_supplies_beta_binomial(
     )
 }
 
+/// Computes the commodity-demand heterogeneity H(B) of a given partition.
+/// 
+/// The metric is defined as the average total variation distance between the commodity-share vector of each active node and the uniform distribution.
+/// Its value lies in [0, 1].
+/// 
+/// Args: 
+///     partition (Dict[int, List[int]]): Mapping from node ID to commodity demands.
+///     original (Dict[int, int]): Original single-commodity demands.
+///
+/// Returns:
+///     float: Commodity-demand heterogeneity in [0,1].
+#[pyfunction]
+#[pyo3(signature = (partition, original))]
+pub fn compute_commodity_demand_heterogeneity(
+    partition: BTreeMap<i64, Vec<i64>>,
+    original: BTreeMap<i64, i64>,
+) -> f64 {
+    logic::generator::compute_commodity_demand_heterogeneity(
+        &partition, 
+        &original,
+    )
+}
+
 /// Generates a full multi-commodity dataset from a single-commodity instance.
 /// 
 /// This function handles the partitioning of supplies and the optional randomization of
@@ -230,6 +253,7 @@ pub fn s2mflow(
     m.add_function(wrap_pyfunction!(split_supplies_uniform, m)?)?;
     m.add_function(wrap_pyfunction!(split_supplies_spread, m)?)?;
     m.add_function(wrap_pyfunction!(split_supplies_beta_binomial, m)?)?;
+    m.add_function(wrap_pyfunction!(compute_commodity_demand_heterogeneity, m)?)?;
     m.add_function(wrap_pyfunction!(generate_multi_commodity_data, m)?)?;
     m.add_function(wrap_pyfunction!(save_multi_commodity_instance, m)?)?;
     m.add_function(wrap_pyfunction!(load_multi_commodity_instance, m)?)?;

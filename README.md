@@ -27,10 +27,13 @@ Felix P. Broesamle and Stefan Nickel. 2026. "On the Single-Multi-Commodity Gap: 
 - **DIMACS Compatible**: Load standard `.min` single-commodity files.
 - **Custom MCMCF Format**: Introduces the `.mcfmin` format for standardized multicommodity data storage.
 - **Supply Partitioning Methods**:
-    - `uniform`: Equal distribution of supply and demand across commodities.
-    - `spread`: Randomized, heterogeneous distribution of supply and demand across commodities.
+    - `method=1`: Equal distribution of supply and demand across commodities.
+    - `method=2`: Intermediate heterogeneity via a beta-binomial allocation.
+    - `method=0`: Randomized, heterogeneous distribution of supply and demand across commodities.
 - **Randomizing Capacities and Costs**: Functionality for generating randomized commodity-specific capacities and costs for each arc.
 - **Network Utilities**: Support for identifying incoming and outgoing neighboring nodes.
+
+**Note:**  Starting with version `0.2.0`, the generation API uses an integer `method` parameter instead of the boolean `is_uniform`. The previous version `0.1.22` used `is_uniform` and is still available.
 
 ## Installation
 
@@ -100,11 +103,11 @@ import s2mflow
 network = s2mflow.load_min_instance("input.min")
 
 # 2. Generate multicommodity data for 3 commodities
-# is_uniform=False activates the stochastic 'Spread' method
+# method=0 activates the stochastic 'Spread' method
 mc_data = s2mflow.generate_multi_commodity_data(
     instance=network,
     num_commodities=3,
-    is_uniform=False,
+    method=0,
     randomize_caps=False,
     randomize_costs=False,
     seed=512,
@@ -114,7 +117,7 @@ mc_data = s2mflow.generate_multi_commodity_data(
 s2mflow.save_multi_commodity_instance("output.mcfmin", network, mc_data)
 
 # Output file (.mcfmin format)
-# p min 2 1 3 0 0 512       (3 commodities, randomize_caps = False (0), randomize_costs = False (0) seed = 512)
+# p min 2 1 3 0 0 0 512       (3 commodities, randomize_caps = False (0), randomize_costs = False (0), method = 0 (Spread), seed = 512)
 # n 1 10 2 5 3      (Supply of 10 split into supplies: 2, 5, 3)
 # n 2-10-2-5-3      (Demand of-10 split into demands: -2,-5,-3)
 # a 1 2 0 10 10 9
@@ -135,8 +138,9 @@ uniform_multi_data = s2mflow.split_supplies_uniform(data, num_commodities=5)
 
 The library uses a natural extension of the DIMACS `.min` format to support multiple commodities:
 
-- **Problem Line**: `p min <num_nodes> <num_edges> <num_commodities> <randomize_caps> <randomize_costs> <is_uniform> <seed = 0>`.
-    - `seed`: relevant if `is_uniform = 0` (Spread method) or if randomization of commodity-specific capacities or costs is enabled (`randomize_caps = 1` or `randomize_costs = 1`).
+- **Problem Line**: `p min <num_nodes> <num_edges> <num_commodities> <randomize_caps> <randomize_costs> <method> <seed = 0>`.
+    - `method`: partitioning strategy (`0` = Spread, `1` = Uniform, `2` = Beta-Binomial)
+    - `seed`: relevant if `method=0` or `method=2`, or if randomization of commodity-specific capacities or costs is enabled (`randomize_caps = 1` or `randomize_costs = 1`).
 - **Node Line**: `n <node_id> <total_demand> <demand_com_1> <demand_com_2> ... <demand_com_K>`.
 - **Arc Line**: Depending on the randomization flags `(randomize_caps, randomize_costs)`:
     - Default `(0, 0)`: `a <from> <to> <low> <cap_total> <cap_total> <cost>`.
@@ -165,7 +169,7 @@ Below, we illustrate how the file structure shifts when applying different gener
 This strategy distributes the nodal demands as evenly as possible across the 4 commodities.
 
 ```python
-uniform_mc_data = s2mflow.generate_multi_commodity_data(instance=network, num_commodities=4, is_uniform=True, randomize_caps=False, randomize_costs=False)
+uniform_mc_data = s2mflow.generate_multi_commodity_data(instance=network, num_commodities=4, method=1, randomize_caps=False, randomize_costs=False)
 
 s2mflow.save_multi_commodity_instance("uniform.mcfmin", network, uniform_mc_data)
 
@@ -187,7 +191,7 @@ This strategy generates high commodity-demand heterogeneity and simultaneously a
 
 ```python
 spread_rand_caps_costs_mc_data = s2mflow.generate_multi_commodity_data(
-    instance=network, num_commodities=4, is_uniform=False,
+    instance=network, num_commodities=4, method=0,
     randomize_caps=True, cap_a=0.6, cap_b=1.0,
     randomize_costs=True, cost_a=0.5, cost_b=2.0,
     seed=42,
@@ -284,7 +288,7 @@ import s2mflow
 
 # 1. Load baseline and generate data in-memory
 net = s2mflow.load_min_instance("input.min")
-mc_data = s2mflow.generate_multi_commodity_data(net, num_commodities=3, is_uniform=False, seed=512)
+mc_data = s2mflow.generate_multi_commodity_data(net, num_commodities=3, method=0, seed=512)
 
 # 2. Initialize Gurobi Model
 model = grb.Model("MCMCF")

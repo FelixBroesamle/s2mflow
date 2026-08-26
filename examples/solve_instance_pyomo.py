@@ -137,7 +137,8 @@ def run_generation_and_solve_workflow(
     mc_data = s2mflow.generate_multi_commodity_data(
         instance=net_instance,
         num_commodities=num_commodities,
-        is_uniform=False,
+        # is_uniform=False,     version 0.1.22
+        method=0,
         randomize_caps=False,
         randomize_costs=False,
         seed=512,

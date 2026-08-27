@@ -70,6 +70,60 @@ pub fn split_supplies_spread(
     )
 }
 
+/// Partitions nodal supply/demand into K commodities using a beta-binomial distribution.
+/// 
+/// Args:
+///     data (Dict[int, int]): A mapping of node IDs to the total supply/demand.
+///     num_commodities (int): The number of commodities.
+///     concentration_param (float): Concentration parameter for Beta-Binomial distribution. Defaults to 3.0.
+///     seed (int): Seed.
+/// 
+/// Returns:
+///     Dict[int, List[int]]: A mapping where each node ID points to a list of the commodity supplies / demands.
+#[pyfunction]
+#[pyo3(signature = (
+    data, 
+    num_commodities, 
+    concentration_param=3.0, 
+    seed=42,
+))]
+pub fn split_supplies_beta_binomial(
+    data: BTreeMap<i64, i64>,
+    num_commodities: usize,
+    concentration_param: f64,
+    seed: u64,
+) -> BTreeMap<i64, Vec<i64>> {
+    logic::generator::split_supply_and_demand_beta_binomial(
+        &data, 
+        num_commodities, 
+        concentration_param,
+        seed
+    )
+}
+
+/// Computes the commodity-demand heterogeneity H(B) of a given partition.
+/// 
+/// The metric is defined as the average total variation distance between the commodity-share vector of each active node and the uniform distribution.
+/// Its value lies in [0, 1].
+/// 
+/// Args: 
+///     partition (Dict[int, List[int]]): Mapping from node ID to commodity demands.
+///     original (Dict[int, int]): Original single-commodity demands.
+///
+/// Returns:
+///     float: Commodity-demand heterogeneity in [0,1].
+#[pyfunction]
+#[pyo3(signature = (partition, original))]
+pub fn compute_commodity_demand_heterogeneity(
+    partition: BTreeMap<i64, Vec<i64>>,
+    original: BTreeMap<i64, i64>,
+) -> f64 {
+    logic::generator::compute_commodity_demand_heterogeneity(
+        &partition, 
+        &original,
+    )
+}
+
 /// Generates a full multi-commodity dataset from a single-commodity instance.
 /// 
 /// This function handles the partitioning of supplies and the optional randomization of
@@ -78,13 +132,14 @@ pub fn split_supplies_spread(
 /// Args:
 ///     instance (NetworkInstance): The base single-commodity network.
 ///     num_commodities (int): The number of commodities.
-///     is_uniform (bool): If True, uses uniform partitioning; otherwise, uses spread.
+///     method (int): Partitioning method. 0 = Spread, 1 = Uniform, 2 = Beta-Binomial.
 ///     randomize_caps (bool, optional): If True, varies capacities per commodity. Default to False.
 ///     cap_a (float, optional): Lower multiplier for capacity randomization. Defaults to 0.8.
 ///     cap_b (float, optional): Upper multiplier for capacity randomization. Defaults to 1.0.
 ///     randomize_costs (bool, optional): If True, varies costs per commodity. Defaults to False.
 ///     cost_a (float, optional): Lower multiplier for cost randomization. Defaults to 0.8.
 ///     cost_b (float, optional): Upper multiplier for cost randomization. Defaults to 1.2.
+///     concentation_param (float, optional): Concentration parameter for Beta-Binomial distribution. Defaults to 3.0.
 ///     seed (int, optional): Seed.
 /// 
 /// Returns:
@@ -93,37 +148,40 @@ pub fn split_supplies_spread(
 #[pyo3(signature = (
     instance, 
     num_commodities, 
-    is_uniform, 
+    method, 
     randomize_caps=false, 
     cap_a=0.8, 
     cap_b=1.0, 
     randomize_costs=false, 
     cost_a=0.8, 
     cost_b=1.2,
+    concentration_param=3.0,
     seed=42,
 ))]
 pub fn generate_multi_commodity_data(
     instance: &models::NetworkInstance, 
     num_commodities: usize, 
-    is_uniform: bool,
+    method: i64,
     randomize_caps: bool,
     cap_a: f64,
     cap_b: f64,
     randomize_costs: bool,
     cost_a: f64,
     cost_b: f64,
+    concentration_param: f64,
     seed: u64,
 ) -> MultiCommodityData {
     logic::generator::generate_multi_commodity_data(
         instance, 
         num_commodities, 
-        is_uniform,
+        method,
         randomize_caps,
         cap_a,
         cap_b,
         randomize_costs,
         cost_a,
         cost_b,
+        concentration_param,
         seed,
     )
 }
@@ -206,6 +264,8 @@ pub fn s2mflow(
     m.add_function(wrap_pyfunction!(load_min_instance, m)?)?;
     m.add_function(wrap_pyfunction!(split_supplies_uniform, m)?)?;
     m.add_function(wrap_pyfunction!(split_supplies_spread, m)?)?;
+    m.add_function(wrap_pyfunction!(split_supplies_beta_binomial, m)?)?;
+    m.add_function(wrap_pyfunction!(compute_commodity_demand_heterogeneity, m)?)?;
     m.add_function(wrap_pyfunction!(generate_multi_commodity_data, m)?)?;
     m.add_function(wrap_pyfunction!(save_multi_commodity_instance, m)?)?;
     m.add_function(wrap_pyfunction!(load_multi_commodity_instance, m)?)?;

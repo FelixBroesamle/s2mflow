@@ -36,7 +36,7 @@ pub struct MultiCommoditySupplies {
 #[derive(Clone, Debug)]
 pub struct MultiCommodityData {
     #[pyo3(get)] pub supply_partition: BTreeMap<i64, Vec<i64>>,
-    #[pyo3(get)] pub is_uniform: bool,
+    #[pyo3(get)] pub method: i64,
     #[pyo3(get)] pub commodity_edges: Vec<(usize, i64, i64)>,
     #[pyo3(get)] pub capacities: Vec<i64>,
     #[pyo3(get)] pub weight: Vec<Vec<i64>>,
@@ -68,6 +68,6 @@ pub struct ParsedMulticommodityInstance {
     #[pyo3(get)] pub commodity_edges: Vec<(usize, i64, i64)>,
     #[pyo3(get)] pub start_nodes: Vec<i64>,
     #[pyo3(get)] pub end_nodes: Vec<i64>,
-    #[pyo3(get)] pub is_uniform: bool,
+    #[pyo3(get)] pub method: i64,
     #[pyo3(get)] pub seed: u64,
 }

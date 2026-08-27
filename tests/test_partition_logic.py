@@ -23,9 +23,9 @@ REAL_MIN_INSTANCES = discover_real_min_files()
 
 @pytest.mark.skipif(not REAL_MIN_INSTANCES, reason="No .min instances found inside data.")
 @pytest.mark.parametrize("input_min_file", REAL_MIN_INSTANCES)
-@pytest.mark.parametrize("is_uniform", [True, False])
+@pytest.mark.parametrize("method", [0, 1, 2])   # 0 = Spread, 1 = Uniform, 2 = Beta-Binomial
 @pytest.mark.parametrize("num_commodities", [2, 3, 5])
-def test_partition_logic(input_min_file, is_uniform, num_commodities):
+def test_partition_logic(input_min_file, method, num_commodities):
     """
     Verifies that the multicommody instance generation is correct:
     1. Sign Consistency
@@ -42,7 +42,7 @@ def test_partition_logic(input_min_file, is_uniform, num_commodities):
     mc_data = s2mflow.generate_multi_commodity_data(
         network,
         num_commodities=num_commodities,
-        is_uniform=is_uniform,
+        method=method,
         randomize_caps=False,
         cap_a=1.0,
         cap_b=1.0,
@@ -58,23 +58,23 @@ def test_partition_logic(input_min_file, is_uniform, num_commodities):
         # Local Balance
         local_sum = sum(partitioned_vals)
         assert local_sum == original_supply, \
-            f"Local balance broken at node {node_id} in {base_name} (Uniform={is_uniform}, K={num_commodities})." \
+            f"Local balance broken at node {node_id} in {base_name} (Method={method}, K={num_commodities})." \
             f"Got sum={local_sum}, expected={original_supply}"
         
         # Sign Consistency
         for val in partitioned_vals:
             if original_supply > 0:
                 assert val >= 0, \
-                    f"Sign violation in {base_name}: Supply node {node_id} with: {val} (Uniform={is_uniform}, K={num_commodities}, org={original_supply})."
+                    f"Sign violation in {base_name}: Supply node {node_id} with: {val} (Method={method}, K={num_commodities}, org={original_supply})."
             elif original_supply < 0:
                 assert val <= 0, \
-                    f"Sign violation in {base_name}: Demand node {node_id} with: {val} (Uniform={is_uniform}, K={num_commodities}, org={original_supply})."
+                    f"Sign violation in {base_name}: Demand node {node_id} with: {val} (Method={method}, K={num_commodities}, org={original_supply})."
 
     # Global Balance
     for k in range(num_commodities):
         commodity_global_sum = sum(node_vals[k] for node_vals in mc_data.supply_partition.values())
         assert commodity_global_sum == 0, \
-            f"Global balance broken for commodity {k} in {base_name} (Uniform={is_uniform}, K={num_commodities})."
+            f"Global balance broken for commodity {k} in {base_name} (Method={method}, K={num_commodities})."
 
 
     

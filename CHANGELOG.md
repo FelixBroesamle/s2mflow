@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this
 
+## [0.2.0] - 2026-08.27
+### Added
+- Added `split_supplies_beta_binomial` for beta-binomial integer partitioning with concentration parameter.
+- Added `compute_commodity_demand_heterogeneity` to compute the Commodity-Demand Heterogeneity metric H(B).
+
+### Changed
+- Replaced the `is_uniform` boolean argument with a `method` integer parameter in `generate_multi_commodity_data` and related functions. Methods: `0` = Spread, `1` = Uniform, `2` = Beta-Binomial.
+- Updated the `.mcfmin` format to store `method` instead of `is_uniform` in the problem line.
+- Modified the global balancing phase to randomly select the surplus commodity for stochastic methods (Spread and Beta-Binomial), while keeping Uniform deterministic.
+- Updated all tests, documentation, and example scripts to reflect the new API and features.
+
 ## [0.1.22] - 2026-07-11
 ### Changed
 - Updated `CITATION.cff` and `README.md` with *SoftwareX* publication details.

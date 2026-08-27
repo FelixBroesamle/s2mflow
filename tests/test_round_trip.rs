@@ -25,7 +25,9 @@ fn test_round_trip() {
                 if path.is_dir() {
                     find_min_files_recursive(&path, files);
                 } else if path.extension().map_or(false, |ext| ext == "min") {
-                    files.push(path);
+                    if !path.to_string_lossy().contains("netgen_sr") {
+                        files.push(path);
+                    }
                 }
             }
         }    
@@ -37,7 +39,7 @@ fn test_round_trip() {
 
     // parameter spaces
     let num_commodities_space = vec![2, 3, 5];
-    let is_uniform_space = vec![true, false];
+    let method_space = vec![0, 1, 2];   // 0 = Spread, 1 = Unifrom, 2 = Beta-Binomial
     let randomize_caps_space = vec![true, false];
     let randomize_costs_space = vec![true, false];
 
@@ -52,30 +54,31 @@ fn test_round_trip() {
         let network = load_min_instance(file_path.to_str().unwrap().to_string()).unwrap();
 
         for &num_commodities in &num_commodities_space {
-            for &is_uniform in &is_uniform_space {
+            for &method in &method_space {
                 for &rand_caps in &randomize_caps_space {
                     for &rand_costs in &randomize_costs_space {
 
                         let case_context = format!(
-                            "File: {}, K: {}, Uniform: {}, rand_caps: {}, rand_costs: {}",
-                            file_name, num_commodities, is_uniform, rand_caps, rand_costs
+                            "File: {}, K: {}, method: {}, rand_caps: {}, rand_costs: {}",
+                            file_name, num_commodities, method, rand_caps, rand_costs
                         );
 
                         let result = std::panic::catch_unwind(|| {
                             let generated = generate_multi_commodity_data(
                                 &network, 
                                 num_commodities, 
-                                is_uniform, 
+                                method, 
                                 rand_caps, 
                                 0.8, 
-                                1.2, 
+                                1.0, 
                                 rand_costs, 
                                 0.8, 
                                 1.2, 
+                                3.0,
                                 seed
                             );
 
-                            let out_name = format!("rt_{}_{}_{}_{}_{}.mcfmin", file_name, num_commodities, is_uniform, rand_caps, rand_costs);
+                            let out_name = format!("rt_{}_{}_{}_{}_{}.mcfmin", file_name, num_commodities, method, rand_caps, rand_costs);
                             let output_path = temp_dir.join(out_name);
                             let output_path_str = output_path.to_str().unwrap().to_string();
 
@@ -89,9 +92,9 @@ fn test_round_trip() {
                             assert_eq!(loaded.num_commodities, num_commodities);
                             assert_eq!(loaded.randomized_capacities, rand_caps);
                             assert_eq!(loaded.randomized_weights, rand_costs);
-                            assert_eq!(loaded.is_uniform, is_uniform);
+                            assert_eq!(loaded.method, method);
 
-                            let expected_seed = if is_uniform && !rand_caps && !rand_costs { 0 } else { seed };
+                            let expected_seed = if method == 1 && !rand_caps && !rand_costs { 0 } else { seed };
                             assert_eq!(loaded.seed, expected_seed);
 
                             for (node_id, gen_vals) in &generated.supply_partition {

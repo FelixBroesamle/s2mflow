@@ -12,12 +12,15 @@ An `.mcfmin` file consists of three types of lines:
 ---
 
 ## 1. The Problem Line
-**Syntax:** `p min <num_nodes> <num_edges> <num_commodities> <randomize_caps> <randomize_costs> <is_uniform> <seed>`
+**Syntax:** `p min <num_nodes> <num_edges> <num_commodities> <randomize_caps> <randomize_costs> <method> <seed>`
 
 * `randomize_caps` (0 or 1): Flag indicating if commodity-specific capacities are used.
 * `randomize_costs` (0 or 1): Flag indicating if commodity-specific costs are used.
-* `is_uniform` (0 or 1): Flag indicating if the uniform partitioning method was used.
-* `seed` (Integer): The random seed used. Relevant if `is_uniform = 0` (Spread method) or if randomization flags are set to `1`. Defaults to `0`.
+* `method` (0, 1, or 2): Partitioning method.
+    - `0` = Spread (high heterogeneity).
+    - `1` = Uniform (low heterogeneity).
+    - `2` = Beta-Binomial (moderate heterogeneity).
+* `seed` (Integer): The random seed used. Relevant if `method=0` or `method=2`, or if randomization flags are set to `1`. Defaults to `0`.
 
 ## 2. The Node Line
 **Syntax:** `n <node_id> <total_demand> <demand_com_1> <demand_com_2> ... <demand_com_K>`
@@ -53,7 +56,7 @@ Below, we illustrate how the file structure shifts when applying different gener
 This strategy distributes the nodal demands as evenly as possible across the 4 commodities.
 
 ```python
-uniform_mc_data = s2mflow.generate_multi_commodity_data(instance=network, num_commodities=4, is_uniform=True, randomize_caps=False, randomize_costs=False)
+uniform_mc_data = s2mflow.generate_multi_commodity_data(instance=network, num_commodities=4, method=1, randomize_caps=False, randomize_costs=False)
 
 s2mflow.save_multi_commodity_instance("uniform.mcfmin", network, uniform_mc_data)
 
@@ -78,7 +81,7 @@ This strategy generates high commodity-demand heterogeneity and applies unfirom 
 spread_rand_caps_mc_data = s2mflow.generate_multi_commodity_data(
     instance=network,
     num_commodities=NUM_COMMODITIES,
-    is_uniform=False,
+    method=0,
     randomize_caps=True,
     cap_a=0.6,
     cap_b=1.0,
@@ -106,7 +109,7 @@ This strategy generates high commodity-demand heterogeneity and applies unfirom 
 spread_rand_costs_mc_data = s2mflow.generate_multi_commodity_data(
     instance=network,
     num_commodities=NUM_COMMODITIES,
-    is_uniform=False,
+    method=0,
     randomize_caps=False,
     randomize_costs=True,
     cost_a=0.5,
@@ -131,7 +134,7 @@ This strategy generates high commodity-demand heterogeneity and simultaneously a
 
 ```python
 spread_rand_caps_costs_mc_data = s2mflow.generate_multi_commodity_data(
-    instance=network, num_commodities=4, is_uniform=False,
+    instance=network, num_commodities=4, method=0,
     randomize_caps=True, cap_a=0.6, cap_b=1.0,
     randomize_costs=True, cost_a=0.5, cost_b=2.0,
     seed=42,

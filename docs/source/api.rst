@@ -26,6 +26,10 @@ Functions
 
 .. autofunction:: split_supplies_spread
 
+.. autofunction:: split_supplies_beta_binomial
+
+.. autofunction:: compute_commodity_demand_heterogeneity
+
 .. autofunction:: generate_multi_commodity_data
 
 .. autofunction:: save_multi_commodity_instance

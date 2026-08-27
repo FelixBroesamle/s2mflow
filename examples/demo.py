@@ -19,7 +19,7 @@ if __name__ == "__main__":
         a 3 4 0 15 4
     """)
 
-    NUM_COMMODITIES = 3
+    NUM_COMMODITIES = 5
     SEED = 512
 
     exp_file = os.path.join(EXAMPLES_DIR, "exp_network.min")
@@ -28,6 +28,7 @@ if __name__ == "__main__":
 
     print(f"Created baseline file: {exp_file}")
 
+    exp_file = os.path.join(EXAMPLES_DIR, "netgen_1.min")
     network = s2mflow.load_min_instance(exp_file)
     print("network supplies: ")
     print(network.supplies)
@@ -45,7 +46,7 @@ if __name__ == "__main__":
     print(uniform_mc_data.supply_partition)
     print("CDH: ", s2mflow.compute_commodity_demand_heterogeneity(uniform_mc_data.supply_partition, network.supplies))
 
-    output_path = os.path.join(EXAMPLES_DIR, "uniform.mcfmin")
+    output_path = os.path.join(EXAMPLES_DIR, f"netgen_1_uniform_{NUM_COMMODITIES}.mcfmin")
     s2mflow.save_multi_commodity_instance(output_path, network, uniform_mc_data)
 
     loaded_uniform_mc_data = s2mflow.load_multi_commodity_instance(output_path)
@@ -63,7 +64,7 @@ if __name__ == "__main__":
     print(spread_mc_data.supply_partition)
     print("CDH: ", s2mflow.compute_commodity_demand_heterogeneity(spread_mc_data.supply_partition, network.supplies))
     
-    output_path = os.path.join(EXAMPLES_DIR, "spread.mcfmin")
+    output_path = os.path.join(EXAMPLES_DIR, f"netgen_1_spread_{NUM_COMMODITIES}.mcfmin")
     s2mflow.save_multi_commodity_instance(output_path, network, spread_mc_data)
 
     loaded_spread_mc_data = s2mflow.load_multi_commodity_instance(output_path)
@@ -75,13 +76,14 @@ if __name__ == "__main__":
         method=2,
         randomize_caps=False,
         randomize_costs=False,
+        concentration_param=30.0,
         seed=SEED,
     )
     print("beta-binomial supplies: ")
     print(beta_binomial_mc_data.supply_partition)
     print("CDH: ", s2mflow.compute_commodity_demand_heterogeneity(beta_binomial_mc_data.supply_partition, network.supplies))
 
-    output_path = os.path.join(EXAMPLES_DIR, "beta_binomial.mcfmin")
+    output_path = os.path.join(EXAMPLES_DIR, f"netgen_1_beta_binomial_{NUM_COMMODITIES}.mcfmin")
     s2mflow.save_multi_commodity_instance(output_path, network, beta_binomial_mc_data)
 
     loaded_beta_binomial_mc_data = s2mflow.load_multi_commodity_instance(output_path)
@@ -167,5 +169,5 @@ if __name__ == "__main__":
     print(s2mflow.compute_commodity_demand_heterogeneity(beta_binomial_multi_data, data))
 
     incoming, outgoing = s2mflow.get_adjacency_mapping(network.nodes, network.arcs)
-    print(incoming)
-    print(outgoing)
+    #print(incoming)
+    #print(outgoing)

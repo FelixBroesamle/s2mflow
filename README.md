@@ -28,7 +28,7 @@ Felix P. Broesamle and Stefan Nickel. 2026. "On the Single-Multi-Commodity Gap: 
 - **Custom MCMCF Format**: Introduces the `.mcfmin` format for standardized multicommodity data storage.
 - **Supply Partitioning Methods**:
     - `method=1`: Equal distribution of supply and demand across commodities.
-    - `method=2`: Intermediate heterogeneity via a beta-binomial allocation.
+    - `method=2`: Intermediate heterogeneity via a beta-binomial allocation. The optional parameter `concentration_param` controls the concentration (default `3.0`).
     - `method=0`: Randomized, heterogeneous distribution of supply and demand across commodities.
 - **Randomizing Capacities and Costs**: Functionality for generating randomized commodity-specific capacities and costs for each arc.
 - **Network Utilities**: Support for identifying incoming and outgoing neighboring nodes.
@@ -132,6 +132,8 @@ spread_multi_data = s2mflow.split_supplies_spread(data, num_commodities=5, seed=
 
 uniform_multi_data = s2mflow.split_supplies_uniform(data, num_commodities=5)
 # uniform_multi_data = {1: [25, 26, 25, 25, 25], 2: [-25,-26,-25,-25,-25]}
+
+beta_binomial_multi_data = s2mflow.split_supplies_beta_binomial(data, num_commodities=5, concentration_param=3.0, seed=512)
 ```
 
 ## The Extended `.mcfmin` Format

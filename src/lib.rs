@@ -75,20 +75,28 @@ pub fn split_supplies_spread(
 /// Args:
 ///     data (Dict[int, int]): A mapping of node IDs to the total supply/demand.
 ///     num_commodities (int): The number of commodities.
+///     concentration_param (float): Concentration parameter for Beta-Binomial distribution. Defaults to 3.0.
 ///     seed (int): Seed.
 /// 
 /// Returns:
 ///     Dict[int, List[int]]: A mapping where each node ID points to a list of the commodity supplies / demands.
 #[pyfunction]
-#[pyo3(signature = (data, num_commodities, seed))]
+#[pyo3(signature = (
+    data, 
+    num_commodities, 
+    concentration_param=3.0, 
+    seed=42,
+))]
 pub fn split_supplies_beta_binomial(
     data: BTreeMap<i64, i64>,
     num_commodities: usize,
+    concentration_param: f64,
     seed: u64,
 ) -> BTreeMap<i64, Vec<i64>> {
     logic::generator::split_supply_and_demand_beta_binomial(
         &data, 
         num_commodities, 
+        concentration_param,
         seed
     )
 }
@@ -131,6 +139,7 @@ pub fn compute_commodity_demand_heterogeneity(
 ///     randomize_costs (bool, optional): If True, varies costs per commodity. Defaults to False.
 ///     cost_a (float, optional): Lower multiplier for cost randomization. Defaults to 0.8.
 ///     cost_b (float, optional): Upper multiplier for cost randomization. Defaults to 1.2.
+///     concentation_param (float, optional): Concentration parameter for Beta-Binomial distribution. Defaults to 3.0.
 ///     seed (int, optional): Seed.
 /// 
 /// Returns:
@@ -146,6 +155,7 @@ pub fn compute_commodity_demand_heterogeneity(
     randomize_costs=false, 
     cost_a=0.8, 
     cost_b=1.2,
+    concentration_param=3.0,
     seed=42,
 ))]
 pub fn generate_multi_commodity_data(
@@ -158,6 +168,7 @@ pub fn generate_multi_commodity_data(
     randomize_costs: bool,
     cost_a: f64,
     cost_b: f64,
+    concentration_param: f64,
     seed: u64,
 ) -> MultiCommodityData {
     logic::generator::generate_multi_commodity_data(
@@ -170,6 +181,7 @@ pub fn generate_multi_commodity_data(
         randomize_costs,
         cost_a,
         cost_b,
+        concentration_param,
         seed,
     )
 }

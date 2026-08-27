@@ -99,12 +99,13 @@ def split_supplies_spread(data: Dict[int, int], num_commodities: int, seed: int)
     """
     ...
 
-def split_supplies_beta_binomial(data: Dict[int, int], num_commodities: int, seed: int) -> Dict[int, List[int]]:
+def split_supplies_beta_binomial(data: Dict[int, int], num_commodities: int, concentration_param: float, seed: int) -> Dict[int, List[int]]:
     """Partitions nodal supply/demand into K commodities using a beta-binomial distribution.
     
     Args:
         data (Dict[int, int]): A mapping of node IDs to their total supply/demand.
-        num_commodities (int): The number of commodities.ä
+        num_commodities (int): The number of commodities.
+        concentration_param (float): Concentration parameter for the Beta-Binomial distribution. Defaults to 3.0.
         seed (int): Seed.
 
     Return:
@@ -134,6 +135,7 @@ def generate_multi_commodity_data(
     randomize_costs: bool = False,
     cost_a: float = 0.8,
     cost_b: float = 1.2,
+    concentration_param: float = 3.0,
     seed: int = 42,
 ) -> MultiCommodityData:
     """Generates a full multi-commodity dataset from a single-commodity instance.
@@ -151,6 +153,7 @@ def generate_multi_commodity_data(
         randomize_costs (bool, optional): If True, varies costs per commodity. Defaults to False.
         cost_a (float, optional): Lower multiplier for cost randomization. Defaults to 0.8.
         cost_b (float, optional): Upper multiplier for cost randomization. Defaults to 1.2.
+        concentration_param (float, optional): Concetration parameter for the Beta-Binomial distribution. Defaults to 3.0.
         seed (int, optional): Seed. Defaults to 42.
 
     Returns:

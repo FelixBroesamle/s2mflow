@@ -74,6 +74,7 @@ fn test_round_trip() {
                                 rand_costs, 
                                 0.8, 
                                 1.2, 
+                                3.0,
                                 seed
                             );
 

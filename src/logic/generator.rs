@@ -109,6 +109,7 @@ pub fn split_supply_and_demand_spread(
 pub fn split_supply_and_demand_beta_binomial(
     data: &BTreeMap<i64, i64>,
     num_commodities: usize,
+    concentration_param: f64,
     seed: u64,
 ) -> BTreeMap<i64, Vec<i64>> {
     let mut rng = StdRng::seed_from_u64(seed);
@@ -125,8 +126,8 @@ pub fn split_supply_and_demand_beta_binomial(
             let x = sample_beta_binomial(
                 &mut rng,
                 remaining,
-                1.0,
-                (num_commodities - j) as f64,
+                concentration_param,
+                concentration_param * (num_commodities - j - 1) as f64,
             );
             
             sample[j] = x;
@@ -302,6 +303,7 @@ pub fn generate_multi_commodity_data(
     randomize_costs: bool,
     cost_a: f64,
     cost_b: f64,
+    concentration_param: f64,
     seed: u64,
 ) -> MultiCommodityData {
     let mut rng = StdRng::seed_from_u64(seed);
@@ -309,7 +311,12 @@ pub fn generate_multi_commodity_data(
     let supply_partition = match method {
         0 => split_supply_and_demand_spread(&instance.supplies, num_commodities, seed),
         1 => split_supply_and_demand_uniform(&instance.supplies, num_commodities),
-        2 => split_supply_and_demand_beta_binomial(&instance.supplies, num_commodities, seed),
+        2 => split_supply_and_demand_beta_binomial(
+            &instance.supplies, 
+            num_commodities, 
+            concentration_param,
+            seed
+        ),
         _ => panic!("Unknown partitioning method: {}", method),
     };
 
@@ -445,7 +452,8 @@ mod tests {
         }
 
         // Test Beta-Binomial
-        let res_beta_binomial = split_supply_and_demand_beta_binomial(&supplies, num_commodities, seed);
+        let concentration_param = 3.0;
+        let res_beta_binomial = split_supply_and_demand_beta_binomial(&supplies, num_commodities, concentration_param, seed);
 
         for (&node, &original_val) in &supplies {
             let partition = &res_beta_binomial[&node];

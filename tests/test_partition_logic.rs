@@ -62,6 +62,7 @@ fn test_partition_logic() {
                         false, 
                         1.0, 
                         1.0, 
+                        3.0,
                         seed
                     );
 

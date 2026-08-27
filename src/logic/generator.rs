@@ -1,11 +1,8 @@
 use core::panic;
 use std::collections::BTreeMap;
-use std::println;
 use rand::prelude::*;
 use rand::{SeedableRng};
 use rand::rngs::StdRng;
-use rand_distr::num_traits::abs;
-use rand_distr::num_traits::ops::inv;
 use rand_distr::{Beta, Binomial, Distribution};
 
 use crate::models::MultiCommodityData;
@@ -398,7 +395,7 @@ pub fn generate_multi_commodity_data(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::{assert_eq, collections::BTreeMap, println};
+    use std::{assert_eq, collections::BTreeMap};
 
     /// Test Phase 1: Local Partitioning (Node-wise Split)
     /// Goal: Ensure the sum of partitioned commodities at a node matches the original node supply.

@@ -144,6 +144,8 @@ pub fn compute_commodity_demand_heterogeneity(
 ///     cap_zero_param (float, optional): Fraction of arcs excluded per commmodity. Defaults to 0.0.
 ///     seed (int, optional): Seed.
 /// 
+/// If cap_zero is True and cap_zero_param > 0, at least one arc per commodity is excluded.
+/// 
 /// Returns:
 ///     MultiCommodityData: The generated multi-commodity data.
 #[pyfunction]

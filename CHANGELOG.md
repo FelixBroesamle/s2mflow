@@ -5,7 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this
 
-## [0.2.0] - 2026-08.27
+## [0.2.1] - 2026-09-05
+### Added
+- Added `cap_zero` and `cap_zero_param` parameters to `generate_multi_commodity_data`.
+- Added zero-capacity arc exclusion logic: if `cap_zero=True` and `cap_zero_param > 0`, at least 
+one arc per commodity is excluded.
+- Added zero-capacity test coverage in Rust and Python test suites.
+
+### Changed
+- Updated `.mcfmin` format to store `cap_zero` and `cap_zero_param` in the problem line.
+- Updated documentation, type stubs, and examples to reflect the zero-capacity feature.
+
+## [0.2.0] - 2026-08-27
 ### Added
 - Added `split_supplies_beta_binomial` for beta-binomial integer partitioning with concentration parameter.
 - Added `compute_commodity_demand_heterogeneity` to compute the Commodity-Demand Heterogeneity metric H(B).

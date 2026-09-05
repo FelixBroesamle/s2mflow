@@ -166,6 +166,8 @@ def generate_multi_commodity_data(
 
     Returns:
         MultiCommodityData: The generated multi-commodity data.
+
+    If cap_zero is True and cap_zero_param > 0, at least one arc per commodity is excluded.
     """
     ...
 

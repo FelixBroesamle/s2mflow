@@ -72,3 +72,46 @@ def test_round_trip(
         assert loaded_mc_data.commodity_capacities[arc_key] == generated_mc_data.capacities_by_arc[i]
         assert loaded_mc_data.commodity_weights[arc_key] == generated_mc_data.weights_by_arc[i]
 
+
+def test_round_trip_zero_capacity(tmp_path):
+    """Test for zero-capacity."""
+    instances = get_min_instances()
+    if not instances:
+        pytest.skip("No .min instance found.")
+
+    input_file = instances[0]
+    network = s2mflow.load_min_instance(input_file)
+    method = 0
+    num_commodities = 3
+    seed = 42
+
+    for rho in [0.1, 0.3]:
+        generated = s2mflow.generate_multi_commodity_data(
+            network,
+            num_commodities=num_commodities,
+            method=method,
+            randomize_caps=False,
+            randomize_costs=False,
+            concentration_param=3.0,
+            cap_zero=True,
+            cap_zero_param=rho,
+            seed=seed,
+        )
+
+        output_path = tmp_path / f"rt_zero_{num_commodities}_{rho}.mcfmin"
+        s2mflow.save_multi_commodity_instance(str(output_path), network, generated)
+
+        loaded = s2mflow.load_multi_commodity_instance(str(output_path))
+
+        assert loaded.cap_zero == True
+        assert loaded.cap_zero_param == rho
+        assert loaded.num_commodities == num_commodities
+
+        # Verify at least one zero capacity exists
+        all_caps = [c for caps in loaded.commodity_capacities.values() for c in caps]
+        assert 0 in all_caps, f"No zero capacities found for rho={rho}"
+
+        # Compare all commodity capacities
+        for i, edge in enumerate(network.edges):
+            arc_key = (edge.tail, edge.head)
+            assert loaded.commodity_capacities[arc_key] == generated.capacities_by_arc[i]

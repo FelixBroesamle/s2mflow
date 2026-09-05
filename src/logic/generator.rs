@@ -148,6 +148,45 @@ pub fn split_supply_and_demand_beta_binomial(
 }
 
 
+fn apply_zero_capacity_exclusions(
+    capacities_by_arc: &mut BTreeMap<usize, Vec<i64>>,
+    original_capacities: &[i64],
+    num_commodities: usize,
+    num_arcs: usize,
+    rho: f64,
+) {
+    if rho <= 0.0 || rho >= 1.0 {
+        return;
+    }
+
+    let m_excl = (rho * num_arcs as f64).floor() as usize;
+    let step = if m_excl > 0 {
+        (num_arcs + m_excl - 1) / m_excl
+    } else {
+        1
+    };
+
+    for k in 0..num_commodities {
+        let start = k % num_arcs;
+        for j in 0..m_excl {
+            let arc_idx = (start + j * step) % num_arcs;
+            if let Some(caps) = capacities_by_arc.get_mut(&arc_idx) {
+                caps[k] = 0;
+            }
+        }
+    }
+
+    // Restoration: if an arc has zero capacity for all commodities,
+    // restore one commodity using a cyclic rule.
+    for (arc_idx, caps) in capacities_by_arc.iter_mut() {
+        if caps.iter().all(|&c| c == 0) {
+            let restore_k = *arc_idx % num_commodities;
+            caps[restore_k] = original_capacities[*arc_idx];
+        }
+    }
+}
+
+
 pub fn compute_commodity_demand_heterogeneity(
     partition: &BTreeMap<i64, Vec<i64>>,
     original: &BTreeMap<i64, i64>,
@@ -301,6 +340,8 @@ pub fn generate_multi_commodity_data(
     cost_a: f64,
     cost_b: f64,
     concentration_param: f64,
+    cap_zero: bool,
+    cap_zero_param: f64,
     seed: u64,
 ) -> MultiCommodityData {
     let mut rng = StdRng::seed_from_u64(seed);
@@ -326,6 +367,8 @@ pub fn generate_multi_commodity_data(
     let mut commodity_edges = Vec::with_capacity(num_commodities * num_original_edges);
     let mut base_capacities = Vec::with_capacity(num_commodities * num_original_edges);
 
+    let mut original_capacities = Vec::with_capacity(num_original_edges);
+
     for (i, edge) in instance.edges.iter().enumerate() {
         let c_f64 = edge.cost as f64;
         let cap_f64 = edge.up as f64;
@@ -337,6 +380,8 @@ pub fn generate_multi_commodity_data(
 
         let mut arc_costs = Vec::with_capacity(num_commodities);
         let mut arc_caps = Vec::with_capacity(num_commodities);
+
+        original_capacities.push(edge.up);
 
         for k in 0..num_commodities {
             commodity_edges.push((k, edge.tail, edge.head));
@@ -367,6 +412,23 @@ pub fn generate_multi_commodity_data(
     }
 
 
+    if cap_zero {
+        apply_zero_capacity_exclusions(
+            &mut capacities_by_arc,
+            &original_capacities,
+            num_commodities,
+            num_original_edges,
+            cap_zero_param,
+        );
+        // Re-insert updated capacities into commodity_capacities.
+        for (i, edge) in instance.edges.iter().enumerate() {
+            let arc_key = (edge.tail, edge.head);
+            if let Some(caps) = capacities_by_arc.get(&i) {
+                commodity_capacities.insert(arc_key, caps.clone());
+            }
+        }
+    }
+
 
     let mut weight = Vec::with_capacity(num_commodities);
     for k in 0..num_commodities {
@@ -387,6 +449,8 @@ pub fn generate_multi_commodity_data(
         num_commodities, 
         randomized_capacities: randomize_caps, 
         randomized_weights: randomize_costs, 
+        cap_zero: cap_zero,
+        cap_zero_param: cap_zero_param,
         seed: seed,
     }
 
@@ -534,6 +598,47 @@ mod tests {
 
         let h_spread = compute_commodity_demand_heterogeneity(&spread_partition, &original);
         assert!(h_spread <= 1.000001 && h_spread >= 0.999999)
+    }
+
+    /// Test: Commdoity-capacity to zero.
+    #[test]
+    fn test_zero_capacity_exclusion() {
+        let mut capacities_by_arc = BTreeMap::new();
+        for i in 0..5 {
+            capacities_by_arc.insert(i, vec![10, 10, 10]);
+        }
+        let original_capacities = vec![10; 5];
+        let num_commodities = 3;
+        let num_arcs = 5;
+        let rho = 0.4; // floor(0.4 * 5) = 2
+
+        apply_zero_capacity_exclusions(
+            &mut capacities_by_arc,
+            &original_capacities, 
+            num_commodities, 
+            num_arcs, 
+            rho
+        );
+
+        // Check that each commodity has exactly 2 zeros.
+        for k in 0..num_commodities {
+            let zero_count = capacities_by_arc.values().filter(|caps| caps[k] == 0).count();
+            assert_eq!(
+                zero_count, 2,
+                "Commodity {} should have exactly 2 zero capacities, got {}",
+                k,
+                zero_count
+            );
+        }
+
+        // Check that no arc has all zero capacities (restoration worked).
+        for (arc_idx, caps) in &capacities_by_arc {
+            assert!(
+                caps.iter().any(|&c| c > 0),
+                "Arc {} has all zero capacities",
+                arc_idx
+            );
+        }
     }
 
 }

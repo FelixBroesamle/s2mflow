@@ -105,6 +105,23 @@ if __name__ == "__main__":
 
     loaded_spread_mc_rand_caps_data = s2mflow.load_multi_commodity_instance(output_path)
 
+    print("-" * 20, "Spread Partitioning with zero-capacity exclusions", "-" * 20)
+    spread_zero_cap_data = s2mflow.generate_multi_commodity_data(
+        instance=network,
+        num_commodities=NUM_COMMODITIES,
+        method=0,
+        randomize_caps=False,
+        randomize_costs=False,
+        cap_zero=True,
+        cap_zero_param=0.2,
+        seed=SEED,
+    )
+
+    output_path = os.path.join(EXAMPLES_DIR, f"spread_zero_cap.mcfmin")
+    s2mflow.save_multi_commodity_instance(output_path, network, spread_zero_cap_data)
+
+    loaded_spread_zero_cap_data = s2mflow.load_multi_commodity_instance(output_path)
+
     print("-" * 20, "Spread Partitioning with randomized costs", "-" * 20)
     spread_mc_rand_costs_data = s2mflow.generate_multi_commodity_data(
         instance=network,
@@ -158,6 +175,7 @@ if __name__ == "__main__":
     beta_binomial_multi_data = s2mflow.split_supplies_beta_binomial(
         data,
         num_commodities=5,
+        concentration_param=5.0,
         seed=SEED,
     )
 

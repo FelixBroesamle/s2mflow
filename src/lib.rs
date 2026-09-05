@@ -140,6 +140,8 @@ pub fn compute_commodity_demand_heterogeneity(
 ///     cost_a (float, optional): Lower multiplier for cost randomization. Defaults to 0.8.
 ///     cost_b (float, optional): Upper multiplier for cost randomization. Defaults to 1.2.
 ///     concentation_param (float, optional): Concentration parameter for Beta-Binomial distribution. Defaults to 3.0.
+///     cap_zero (bool, optional): If True, set a fraction of individual capacities to zero. Defaults to False.
+///     cap_zero_param (float, optional): Fraction of arcs excluded per commmodity. Defaults to 0.0.
 ///     seed (int, optional): Seed.
 /// 
 /// Returns:
@@ -156,6 +158,8 @@ pub fn compute_commodity_demand_heterogeneity(
     cost_a=0.8, 
     cost_b=1.2,
     concentration_param=3.0,
+    cap_zero=false,
+    cap_zero_param=0.0,
     seed=42,
 ))]
 pub fn generate_multi_commodity_data(
@@ -169,6 +173,8 @@ pub fn generate_multi_commodity_data(
     cost_a: f64,
     cost_b: f64,
     concentration_param: f64,
+    cap_zero: bool,
+    cap_zero_param: f64,
     seed: u64,
 ) -> MultiCommodityData {
     logic::generator::generate_multi_commodity_data(
@@ -182,6 +188,8 @@ pub fn generate_multi_commodity_data(
         cost_a,
         cost_b,
         concentration_param,
+        cap_zero,
+        cap_zero_param,
         seed,
     )
 }

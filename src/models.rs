@@ -47,6 +47,8 @@ pub struct MultiCommodityData {
     #[pyo3(get)] pub num_commodities: usize,
     #[pyo3(get)] pub randomized_capacities: bool,
     #[pyo3(get)] pub randomized_weights: bool,
+    #[pyo3(get)] pub cap_zero: bool,
+    #[pyo3(get)] pub cap_zero_param: f64,
     #[pyo3(get)] pub seed: u64,
 }
 
@@ -69,5 +71,7 @@ pub struct ParsedMulticommodityInstance {
     #[pyo3(get)] pub start_nodes: Vec<i64>,
     #[pyo3(get)] pub end_nodes: Vec<i64>,
     #[pyo3(get)] pub method: i64,
+    #[pyo3(get)] pub cap_zero: bool,
+    #[pyo3(get)] pub cap_zero_param: f64,
     #[pyo3(get)] pub seed: u64,
 }

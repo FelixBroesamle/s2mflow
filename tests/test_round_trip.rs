@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::{assert_eq, path::PathBuf};
 use s2mflow::{
     load_min_instance,
     generate_multi_commodity_data,
@@ -75,6 +75,8 @@ fn test_round_trip() {
                                 0.8, 
                                 1.2, 
                                 3.0,
+                                false,
+                                0.0,
                                 seed
                             );
 
@@ -121,6 +123,68 @@ fn test_round_trip() {
                         }
                     }
                 }
+            }
+        }
+    }
+
+    // Zero-capacity: test
+    let zero_cap_params = vec![0.1, 0.3];
+    let zero_cap_method = 0;
+    let zero_cap_num_commodities = 3;
+
+    for file_path in &min_files {
+        let file_name = file_path.file_name().unwrap().to_str().unwrap().to_string();
+        let network = load_min_instance(file_path.to_str().unwrap().to_string()).unwrap();
+
+        for &rho in &zero_cap_params {
+            let case_context = format!(
+                "File: {}, K: {}, method: {}, rho: {}",
+                file_name, zero_cap_num_commodities, zero_cap_method, rho
+            );
+
+            let result = std::panic::catch_unwind(|| {
+                let generated = generate_multi_commodity_data(
+                    &network,
+                    zero_cap_num_commodities,
+                    zero_cap_method,
+                    false,
+                    0.8,
+                    1.0,
+                    false,
+                    0.8,
+                    1.2,
+                    3.0,
+                    true,
+                    rho,
+                    seed,
+                );
+
+                let out_name = format!("rt_zero_{}_{}_{}.mcfmin", file_name, zero_cap_num_commodities, rho);
+                let output_path = temp_dir.join(out_name);
+                let output_path_str = output_path.to_str().unwrap().to_string();
+
+                save_multi_commodity_instance(output_path_str.clone(), &network, &generated).unwrap();
+                let loaded = load_multi_commodity_instance(output_path_str.clone()).unwrap();
+
+                assert_eq!(loaded.cap_zero, true);
+                assert_eq!(loaded.cap_zero_param, rho);
+                assert_eq!(loaded.num_commodities, zero_cap_num_commodities);
+
+                let zero_count: usize = loaded.commodity_capacities.values().map(|caps| caps.iter().filter(|&&c| c == 0).count()).sum();
+                assert!(zero_count > 0, "No zero capacities found for rho={}", rho);
+
+                // Compare all commodity capacities after round-trip
+                for (i, edge) in network.edges.iter().enumerate() {
+                    let arc_key = (edge.tail, edge.head);
+                    let loaded_caps = loaded.commodity_capacities.get(&arc_key).expect("Missing capacity");
+                    assert_eq!(loaded_caps, &generated.capacities_by_arc[&i]);
+                }
+
+                let _ = std::fs::remove_file(output_path);
+            });
+
+            if result.is_err() {
+                failed_cases.push(case_context);
             }
         }
     }

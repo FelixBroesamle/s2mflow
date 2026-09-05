@@ -159,7 +159,13 @@ fn apply_zero_capacity_exclusions(
         return;
     }
 
-    let m_excl = (rho * num_arcs as f64).floor() as usize;
+    let m_excl = if rho > 0.0 {
+        let raw = (rho * num_arcs as f64).floor() as usize;
+        raw.max(1)
+    } else {
+        0
+    };
+    
     let step = if m_excl > 0 {
         (num_arcs + m_excl - 1) / m_excl
     } else {

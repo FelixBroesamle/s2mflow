@@ -37,6 +37,8 @@ class MultiCommodityData:
     num_commodities: int
     randomized_capacities: bool
     randomized_weights: bool
+    cap_zero: bool
+    cap_zero_param: float
     seed: int
 
 class ParsedMulticommodityInstance:
@@ -58,6 +60,8 @@ class ParsedMulticommodityInstance:
     start_nodes: List[int]
     end_nodes: List[int]
     method: int
+    cap_zero: bool
+    cap_zero_param: float
     seed: int
 
 def load_min_instance(path: str) -> NetworkInstance:
@@ -136,6 +140,8 @@ def generate_multi_commodity_data(
     cost_a: float = 0.8,
     cost_b: float = 1.2,
     concentration_param: float = 3.0,
+    cap_zero: bool = False,
+    cap_zero_param: float = 0.0,
     seed: int = 42,
 ) -> MultiCommodityData:
     """Generates a full multi-commodity dataset from a single-commodity instance.
@@ -154,10 +160,14 @@ def generate_multi_commodity_data(
         cost_a (float, optional): Lower multiplier for cost randomization. Defaults to 0.8.
         cost_b (float, optional): Upper multiplier for cost randomization. Defaults to 1.2.
         concentration_param (float, optional): Concetration parameter for the Beta-Binomial distribution. Defaults to 3.0.
+        cap_zero (bool, optional): If True, set a fraction of individual capacities to zero. Defaults to False.
+        cap_zero_param (float, optional): Fraction of arcs excluded per commodity. Defaults to 0.0.
         seed (int, optional): Seed. Defaults to 42.
 
     Returns:
         MultiCommodityData: The generated multi-commodity data.
+
+    If cap_zero is True and cap_zero_param > 0, at least one arc per commodity is excluded.
     """
     ...
 

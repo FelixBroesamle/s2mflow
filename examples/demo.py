@@ -28,7 +28,7 @@ if __name__ == "__main__":
 
     print(f"Created baseline file: {exp_file}")
 
-    exp_file = os.path.join(EXAMPLES_DIR, "netgen_1.min")
+    exp_file = os.path.join(EXAMPLES_DIR, "exp_network.min")
     network = s2mflow.load_min_instance(exp_file)
     print("network supplies: ")
     print(network.supplies)
@@ -42,14 +42,18 @@ if __name__ == "__main__":
         randomize_costs=False,
     )
 
+    print(uniform_mc_data.seed)
+
     print("uniform supplies: ")
     print(uniform_mc_data.supply_partition)
     print("CDH: ", s2mflow.compute_commodity_demand_heterogeneity(uniform_mc_data.supply_partition, network.supplies))
 
-    output_path = os.path.join(EXAMPLES_DIR, f"netgen_1_uniform_{NUM_COMMODITIES}.mcfmin")
+    output_path = os.path.join(EXAMPLES_DIR, f"uniform.mcfmin")
     s2mflow.save_multi_commodity_instance(output_path, network, uniform_mc_data)
 
     loaded_uniform_mc_data = s2mflow.load_multi_commodity_instance(output_path)
+
+    print(loaded_uniform_mc_data.seed)
 
     print("-" * 20, "Spread Partitioning", "-" * 20)
     spread_mc_data = s2mflow.generate_multi_commodity_data(
@@ -60,14 +64,19 @@ if __name__ == "__main__":
         randomize_costs=False,
         seed=SEED,
     )
+
+    print(spread_mc_data.seed)
+
     print("spread supplies: ")
     print(spread_mc_data.supply_partition)
     print("CDH: ", s2mflow.compute_commodity_demand_heterogeneity(spread_mc_data.supply_partition, network.supplies))
     
-    output_path = os.path.join(EXAMPLES_DIR, f"netgen_1_spread_{NUM_COMMODITIES}.mcfmin")
+    output_path = os.path.join(EXAMPLES_DIR, f"spread.mcfmin")
     s2mflow.save_multi_commodity_instance(output_path, network, spread_mc_data)
 
     loaded_spread_mc_data = s2mflow.load_multi_commodity_instance(output_path)
+
+    print(loaded_spread_mc_data.seed)
 
     print("-" * 20, "Beta-Binomial Partitioning", "-" * 20)
     beta_binomial_mc_data = s2mflow.generate_multi_commodity_data(
@@ -79,14 +88,19 @@ if __name__ == "__main__":
         concentration_param=30.0,
         seed=SEED,
     )
+
+    print(beta_binomial_mc_data.seed)
+
     print("beta-binomial supplies: ")
     print(beta_binomial_mc_data.supply_partition)
     print("CDH: ", s2mflow.compute_commodity_demand_heterogeneity(beta_binomial_mc_data.supply_partition, network.supplies))
 
-    output_path = os.path.join(EXAMPLES_DIR, f"netgen_1_beta_binomial_{NUM_COMMODITIES}.mcfmin")
+    output_path = os.path.join(EXAMPLES_DIR, f"beta_binomial.mcfmin")
     s2mflow.save_multi_commodity_instance(output_path, network, beta_binomial_mc_data)
 
     loaded_beta_binomial_mc_data = s2mflow.load_multi_commodity_instance(output_path)
+
+    print(loaded_beta_binomial_mc_data.seed)
 
     print("-" * 20, "Spread Partitioning with randomized capacities", "-" * 20)
     spread_mc_rand_caps_data = s2mflow.generate_multi_commodity_data(
@@ -100,10 +114,83 @@ if __name__ == "__main__":
         seed=SEED,
     )
 
+    print(spread_mc_rand_caps_data.seed)
+
     output_path = os.path.join(EXAMPLES_DIR, "spread_rand_caps.mcfmin")
     s2mflow.save_multi_commodity_instance(output_path, network, spread_mc_rand_caps_data)
 
     loaded_spread_mc_rand_caps_data = s2mflow.load_multi_commodity_instance(output_path)
+
+    print(loaded_spread_mc_rand_caps_data.seed)
+
+    print("-" * 20, "Spread Partitioning with zero-capacity exclusions", "-" * 20)
+    spread_zero_cap_data = s2mflow.generate_multi_commodity_data(
+        instance=network,
+        num_commodities=NUM_COMMODITIES,
+        method=0,
+        randomize_caps=False,
+        randomize_costs=False,
+        cap_zero=True,
+        cap_zero_param=0.02,
+        seed=SEED,
+    )
+
+    print(spread_zero_cap_data.seed)
+
+    output_path = os.path.join(EXAMPLES_DIR, f"spread_zero_cap.mcfmin")
+    s2mflow.save_multi_commodity_instance(output_path, network, spread_zero_cap_data)
+
+    loaded_spread_zero_cap_data = s2mflow.load_multi_commodity_instance(output_path)
+
+    print(loaded_spread_zero_cap_data.seed)
+
+    print("-" * 20, "Spread Partitioning with zero-capacity exclusions and randomized capacities", "-" * 20)
+    spread_zero_cap_and_rand_caps_data = s2mflow.generate_multi_commodity_data(
+        instance=network,
+        num_commodities=NUM_COMMODITIES,
+        method=0,
+        randomize_caps=True,
+        cap_a=0.8,
+        cap_b=1.0,
+        randomize_costs=False,
+        cap_zero=True,
+        cap_zero_param=0.02,
+        seed=SEED,
+    )
+
+    print(spread_zero_cap_and_rand_caps_data.seed)
+
+    output_path = os.path.join(EXAMPLES_DIR, f"spread_zero_cap_rand_caps.mcfmin")
+    s2mflow.save_multi_commodity_instance(output_path, network, spread_zero_cap_and_rand_caps_data)
+
+    loaded_spread_zero_cap_and_rand_caps_data = s2mflow.load_multi_commodity_instance(output_path)
+
+    print(loaded_spread_zero_cap_and_rand_caps_data.seed)
+
+    print("-" * 20, "Spread Partitioning with zero-capacity exclusions, randomized capacities, and randomized costs", "-" * 20)
+    spread_zero_cap_rand_caps_rand_costs_data = s2mflow.generate_multi_commodity_data(
+        instance=network,
+        num_commodities=NUM_COMMODITIES,
+        method=0,
+        randomize_caps=True,
+        cap_a=0.6,
+        cap_b=1.0,
+        randomize_costs=True,
+        cost_a=0.5,
+        cost_b=2.0,
+        cap_zero=True,
+        cap_zero_param=0.05,
+        seed=SEED,
+    )
+
+    print(spread_zero_cap_rand_caps_rand_costs_data.seed)
+
+    output_path = os.path.join(EXAMPLES_DIR, f"spread_zero_cap_rand_caps_rand_costs.mcfmin")
+    s2mflow.save_multi_commodity_instance(output_path, network, spread_zero_cap_rand_caps_rand_costs_data)
+
+    loaded_spread_zero_cap_rand_caps_rand_costs_data = s2mflow.load_multi_commodity_instance(output_path)
+
+    print(loaded_spread_zero_cap_rand_caps_rand_costs_data.seed)
 
     print("-" * 20, "Spread Partitioning with randomized costs", "-" * 20)
     spread_mc_rand_costs_data = s2mflow.generate_multi_commodity_data(
@@ -117,10 +204,14 @@ if __name__ == "__main__":
         seed=SEED,
     )
 
+    print(spread_mc_rand_costs_data.seed)
+
     output_path = os.path.join(EXAMPLES_DIR, "spread_rand_costs.mcfmin")
     s2mflow.save_multi_commodity_instance(output_path, network, spread_mc_rand_costs_data)
 
     loaded_spread_mc_rand_costs_data = s2mflow.load_multi_commodity_instance(output_path)
+
+    print(loaded_spread_mc_rand_costs_data.seed)
 
     print("-" * 20, "Spread Partitioning with randomized capacities and costs", "-" * 20)
     spread_mc_rand_caps_costs_data = s2mflow.generate_multi_commodity_data(
@@ -136,10 +227,14 @@ if __name__ == "__main__":
         seed=SEED,
     )
 
+    print(spread_mc_rand_caps_costs_data.seed)
+
     output_path = os.path.join(EXAMPLES_DIR, "spread_rand_caps_costs.mcfmin")
     s2mflow.save_multi_commodity_instance(output_path, network, spread_mc_rand_caps_costs_data)
 
     loaded_spread_mc_rand_caps_costs_data = s2mflow.load_multi_commodity_instance(output_path)
+
+    print(loaded_spread_mc_rand_caps_costs_data.seed)
 
     data = {1: 387, 2: -387}
     print(data)
@@ -158,6 +253,7 @@ if __name__ == "__main__":
     beta_binomial_multi_data = s2mflow.split_supplies_beta_binomial(
         data,
         num_commodities=5,
+        concentration_param=5.0,
         seed=SEED,
     )
 

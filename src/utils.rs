@@ -93,6 +93,9 @@ pub fn parse_multi_min(path: &str) -> Result<ParsedMulticommodityInstance, Box<d
     let mut rand_costs = false;
     let mut seed = 0;
     let mut method: i64 = 0;
+    let mut cap_zero = false;
+    let mut cap_zero_param = 0.0;
+    let mut has_multi_caps = false;
 
     let mut nodes = Vec::new();
     let mut node_seen = BTreeSet::new();
@@ -121,11 +124,15 @@ pub fn parse_multi_min(path: &str) -> Result<ParsedMulticommodityInstance, Box<d
                 num_nodes = tokens[2].parse()?;
                 num_arcs = tokens[3].parse()?;
                 num_commodities = tokens[4].parse()?;
-                seed = tokens[8].parse()?;
+                seed = tokens[10].parse()?;
 
                 rand_caps = tokens.get(5).map_or(Ok(0), |t| t.parse::<i64>())? != 0;
                 rand_costs = tokens.get(6).map_or(Ok(0), |t| t.parse::<i64>())? != 0;
                 method = tokens.get(7).map_or(Ok(0), |t| t.parse::<i64>())?;
+                cap_zero = tokens.get(8).map_or(Ok(0), |t| t.parse::<i64>())? != 0;
+                cap_zero_param = tokens.get(9).map_or(Ok(0.0), |t| t.parse::<f64>())?;
+
+                has_multi_caps = rand_caps || cap_zero;
 
                 edges.reserve(num_arcs as usize);
                 capacities.reserve(num_arcs as usize);
@@ -157,7 +164,7 @@ pub fn parse_multi_min(path: &str) -> Result<ParsedMulticommodityInstance, Box<d
                 let k = num_commodities as usize;
                 let mut current_idx = 5;
 
-                let parsed_caps: Vec<i64> = if rand_caps {
+                let parsed_caps: Vec<i64> = if has_multi_caps {
                     let res = tokens[current_idx..(current_idx + k)].iter().map(|&t| t.parse::<i64>()).collect::<Result<Vec<_>, _>>()?;
                     current_idx += k;
                     res
@@ -221,6 +228,8 @@ pub fn parse_multi_min(path: &str) -> Result<ParsedMulticommodityInstance, Box<d
         start_nodes: start_nodes, 
         end_nodes: end_nodes, 
         method: method,
+        cap_zero: cap_zero,
+        cap_zero_param: cap_zero_param,
         seed: seed,
     })
 }
@@ -233,7 +242,9 @@ pub fn export_to_dimacs(
     let file = File::create(path)?;
     let mut writer = BufWriter::new(file);
 
-    let write_seed = if multi_data.method == 1 && !multi_data.randomized_capacities && !multi_data.randomized_weights {
+    let write_seed = if multi_data.method == 1 
+        && !multi_data.randomized_capacities 
+        && !multi_data.randomized_weights {
         0
     } else {
         multi_data.seed
@@ -245,17 +256,20 @@ pub fn export_to_dimacs(
     // 2. Problem Line: p min <nodes> <arcs> <commodities>
     let rand_caps_int = if multi_data.randomized_capacities { 1 } else { 0 };
     let rand_costs_int = if multi_data.randomized_weights { 1 } else { 0 };
+    let cap_zero_int = if multi_data.cap_zero  { 1 } else { 0 };
 
     // p min num_nodes num_arcs num_commodities rand_caps rand_costs is_uniform seed
     writeln!(
         writer,
-        "p min {} {} {} {} {} {} {}",
+        "p min {} {} {} {} {} {} {} {} {}",
         instance.num_nodes,
         instance.num_arcs,
         multi_data.num_commodities,
         rand_caps_int,
         rand_costs_int,
         multi_data.method,
+        cap_zero_int,
+        multi_data.cap_zero_param,
         write_seed,
     )?;
 
@@ -271,7 +285,13 @@ pub fn export_to_dimacs(
         let caps = &multi_data.capacities_by_arc[&i];
         let costs = &multi_data.weights_by_arc[&i];
 
-        let caps_to_write = if multi_data.randomized_capacities { caps.as_slice() } else { &caps[0..1] };
+        let write_per_commodity_caps = multi_data.randomized_capacities || multi_data.cap_zero;
+        let caps_to_write = if write_per_commodity_caps {
+            caps.as_slice()
+        } else {
+            &caps[0..1]
+        };
+
         let costs_to_write = if multi_data.randomized_weights { costs.as_slice() } else { &costs[0..1]};
 
         let caps_str: Vec<String> = caps_to_write.iter().map(|c| c.to_string()).collect();

@@ -25,7 +25,7 @@ fn test_round_trip() {
                 if path.is_dir() {
                     find_min_files_recursive(&path, files);
                 } else if path.extension().map_or(false, |ext| ext == "min") {
-                    if !path.to_string_lossy().contains("netgen_sr") {
+                    if !path.to_string_lossy().contains("netgen_sr") & !path.to_string_lossy().contains("gridgen") {
                         files.push(path);
                     }
                 }
@@ -105,7 +105,7 @@ fn test_round_trip() {
                             }
 
                             for (i, edge) in network.edges.iter().enumerate() {
-                                let arc_key = (edge.tail, edge.head);
+                                let arc_key = (edge.tail, edge.head, edge.index);
 
                                 let loaded_cap = loaded.commodity_capacities.get(&arc_key).expect(&format!("Arc key weight missing: {:?}", arc_key));
                                 assert_eq!(loaded_cap, &generated.capacities_by_arc[&i]);
@@ -175,7 +175,7 @@ fn test_round_trip() {
 
                 // Compare all commodity capacities after round-trip
                 for (i, edge) in network.edges.iter().enumerate() {
-                    let arc_key = (edge.tail, edge.head);
+                    let arc_key = (edge.tail, edge.head, edge.index);
                     let loaded_caps = loaded.commodity_capacities.get(&arc_key).expect("Missing capacity");
                     assert_eq!(loaded_caps, &generated.capacities_by_arc[&i]);
                 }

@@ -5,10 +5,16 @@ mod models;
 mod utils;
 mod logic;
 
+pub use models::{
+    Edge,
+    MultiCommodityData,
+    MultiCommoditySupplies,
+    NetworkInstance,
+    ParsedMulticommodityInstance,
+};
+
 use pyo3::prelude::*;
 use std::collections::BTreeMap;
-
-use crate::models::{MultiCommodityData, NetworkInstance};
 
 ///Loads a single-commodity network instance from a DIMACS .min file.
 /// 

@@ -1,12 +1,18 @@
 from typing import Dict, List, Tuple
 
 class Edge:
-    """Represents a single directed edge within the network."""
+    """Represents a single directed edge within the network.
+    
+    Every arc is uniquely identified by ``(tail, head, index)`` where ``index``
+    is the 0-based position of the arc among arcs sharing ``(tail, head)``.
+    For instances without parallel arcs, ``index`` is always 0.
+    """
     tail: int
     head: int
     low: int
     up: int
     cost: int
+    index: int
 
 class NetworkInstance:
     """A parsed single-commodity network instance loaded from a DIMACS .min file."""
@@ -19,6 +25,14 @@ class NetworkInstance:
     capacities: List[int]
     weights: List[int]
 
+    parallel: bool
+    num_parallel_arc_pairs: int
+    arc_indices: Dict[Tuple[int, int], List[int]]
+
+    def topology(self) -> List[Tuple[int, int]]:
+        """Topology-only view ``(tail, head)`` for ``get_adjacency_mapping``."""
+        ...
+
 class MultiCommoditySupplies:
     """Contains the partitioned supply/demand data across multiple commodities."""
     partition: Dict[int, List[int]]
@@ -27,19 +41,22 @@ class MultiCommodityData:
     """The generated multicommodity data structure, lifting the base network into K dimensions."""
     supply_partition: Dict[int, List[int]]
     method: int
-    commodity_edges: List[Tuple[int, int, int]]
+    commodity_edges: List[Tuple[int, int, int, int]]
     capacities: List[int]
     weight: List[List[int]]
     weights_by_arc: Dict[int, List[int]]
     capacities_by_arc: Dict[int, List[int]]
-    commodity_capacities: Dict[Tuple[int, int], List[int]]
-    commodity_weights: Dict[Tuple[int, int], List[int]]
+    commodity_capacities: Dict[Tuple[int, int, int], List[int]]
+    commodity_weights: Dict[Tuple[int, int, int], List[int]]
     num_commodities: int
     randomized_capacities: bool
     randomized_weights: bool
     cap_zero: bool
     cap_zero_param: float
     seed: int
+
+    parallel: bool
+    arc_indices: Dict[Tuple[int, int], List[int]]
 
 class ParsedMulticommodityInstance:
     """An object containing multi-commodity data parsed directly from a serialized .mcfmin file."""
@@ -49,13 +66,13 @@ class ParsedMulticommodityInstance:
     randomized_capacities: bool
     randomized_weights: bool
     nodes: List[int]
-    edges: List[Tuple[int, int]]
+    edges: List[Tuple[int, int, int]]
     supplies: Dict[int, int]
     commodity_supply_demand_data: Dict[int, List[int]]
     capacities: List[int]
-    commodity_capacities: Dict[Tuple[int, int], List[int]]
-    commodity_weights: Dict[tuple[int, int], List[int]]
-    commodity_edges: List[Tuple[int, int, int]]
+    commodity_capacities: Dict[Tuple[int, int, int], List[int]]
+    commodity_weights: Dict[tuple[int, int, int], List[int]]
+    commodity_edges: List[Tuple[int, int, int, int]]
     commodity_bundle_capacities: List[int]
     start_nodes: List[int]
     end_nodes: List[int]
@@ -63,6 +80,13 @@ class ParsedMulticommodityInstance:
     cap_zero: bool
     cap_zero_param: float
     seed: int
+
+    parallel: bool
+    arc_indices: Dict[Tuple[int, int], List[int]]
+
+    def topology(self) -> List[Tuple[int, int]]:
+        """Topology-only view ``(tail, head)`` for ``get_adjacency_mapping``."""
+        ...
 
 def load_min_instance(path: str) -> NetworkInstance:
     """Loads a single-commodity network instance from a DIMACS .min file.

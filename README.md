@@ -290,7 +290,7 @@ results = solver.solve(model, tee=True)
 print(f"[+] Optimal Objective Value: {pyo.value(model.obj)}")
 ```
 
-We have providedn some provided network instances (see `data/`).
+We have provided in `examples/solve_instance_pyomo.py` a complete workflow / pipeline for running examples on some provided network instances (see `data/`).
 
 ### Workflow 2: In-Memory Generation with Gurobi (Commercial Solver)
 

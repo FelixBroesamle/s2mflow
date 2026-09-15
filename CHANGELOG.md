@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this
 
+## [0.3.0] - 2026-09-15
+### Added
+- Added `parallel` and `num_parallel_arc_pairs` metadata to `NetworkInstance`, and `parallel` to `MultiCommodityData` and `ParsedMulticommodityInstance`.
+- Added `arc_indices: Dict[Tuple[int, int], List[int]]` to `NetworkInstance`, `MultiCommodityData`, and `ParsedMulticommodityInstance`, mapping each `(tail, head)` pair to the position of arcs sharing that pair.
+- Added `topology()` to `NetworkInstance` and `ParsedMulticommodityInstance`.
+- Added `commodity_bundle_capacities` to `ParsedMulticommoDityInstance`.
+- Added `tests/test_parallel.py` and `tests/test_parallel.rs` covering parallel-arc instances.
+
+### Changed
+- Arc identities are now 3-tuples `(tail, head, index)`.
+- Commodity-arc identities are now 4-tuples `(k, tail, head, index)`` .
+- Updated example scripts.
+- Updated documentation, type stubs, and API reference.
+
 ## [0.2.1] - 2026-09-05
 ### Added
 - Added `cap_zero` and `cap_zero_param` parameters to `generate_multi_commodity_data`.

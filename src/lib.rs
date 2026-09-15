@@ -272,6 +272,28 @@ pub fn get_adjacency_mapping(
     )
 }
 
+/// Creates the incidence mapping of the graph.
+/// 
+/// Args:
+///     nodes (List[int]): List of node IDs.
+///     edges (List[Tuple[int, int, int]]): List of `(tail, head, index)` triples.
+/// 
+/// Returns:
+///     Tuple[Dict[int, List[Tuple[int, int, int]]], Dict[int, List[Tuple[int, int, int]]]]: Incoming and outgoing 
+/// arc lists per node.
+#[pyfunction]
+#[pyo3(signature = (nodes, edges))]
+pub fn get_incidence_mapping(
+    nodes: Vec<i64>,
+    edges: Vec<(i64, i64, i64)>
+) -> (BTreeMap<i64, Vec<(i64, i64, i64)>>, BTreeMap<i64, Vec<(i64, i64, i64)>>) {
+    crate::utils::get_incidence_mapping(
+        nodes, 
+        edges
+    )
+}
+
+
 #[pymodule]
 pub fn s2mflow(
     _py: Python, 
@@ -286,6 +308,7 @@ pub fn s2mflow(
     m.add_function(wrap_pyfunction!(save_multi_commodity_instance, m)?)?;
     m.add_function(wrap_pyfunction!(load_multi_commodity_instance, m)?)?;
     m.add_function(wrap_pyfunction!(get_adjacency_mapping, m)?)?;
+    m.add_function(wrap_pyfunction!(get_incidence_mapping, m)?)?;
     m.add_class::<models::Edge>()?;
     m.add_class::<models::NetworkInstance>()?;
     m.add_class::<models::MultiCommoditySupplies>()?;

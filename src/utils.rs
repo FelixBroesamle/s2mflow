@@ -361,3 +361,31 @@ pub fn get_adjacency_mapping(
 
     (incoming, outgoing)
 }
+
+/// Creates the incidence mapping of the graph: for each node, the list of arcs incident to it (incoming and
+/// outgoing), keyed by the full `(tail, head, index)` triple.
+pub fn get_incidence_mapping(
+    nodes: Vec<i64>,
+    edges: Vec<(i64, i64, i64)>,
+) -> (
+    BTreeMap<i64, Vec<(i64, i64, i64)>>,
+    BTreeMap<i64, Vec<(i64, i64, i64)>>,
+) {
+    let mut incoming: BTreeMap<i64, Vec<(i64, i64, i64)>> = BTreeMap::new();
+    let mut outgoing: BTreeMap<i64, Vec<(i64, i64, i64)>> = BTreeMap::new();
+
+    for &node in &nodes {
+        incoming.entry(node).or_default();
+        outgoing.entry(node).or_default();
+    }
+
+    for arc in edges {
+        let (tail, head, _) = arc;
+        incoming.entry(head).or_default().push(arc);
+        outgoing.entry(tail).or_default().push(arc);
+    }
+
+    (incoming, outgoing)
+}
+
+

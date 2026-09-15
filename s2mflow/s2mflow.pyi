@@ -234,14 +234,33 @@ def load_multi_commodity_instance(path: str) -> ParsedMulticommodityInstance:
     ...
 
 def get_adjacency_mapping(
-    nodes: list[int], 
-    edges: list[tuple[int, int]]
-) -> tuple[dict[int, list[int]], dict[int, list[int]]]: 
+    nodes: List[int], 
+    edges: List[Tuple[int, int]]
+) -> Tuple[Dict[int, List[int]], Dict[int, List[int]]]: 
     """
     Create adjacency mapping (incoming, outgoing).
 
     Args:
         nodes (int): List of node IDs.
         edges (List[int, int]): List of edges.
+    """
+    ...
+
+def get_incidence_mapping(
+    nodes: List[int],
+    edges: List[Tuple[int, int, int]],
+) -> Tuple[Dict[int, List[Tuple[int, int, int]]], Dict[int, List[Tuple[int, int, int]]]]:
+    """
+    Create incidence mapping (incoming, outgoing).
+
+    Complements `get_adjacency_mapping`, which returns only neighbor node ids.
+
+    Args:
+        nodes (List[int]): List of node IDs.
+        edges (List[Tuple[int, int, int]]): List of `(tail, head, index)` triples.
+
+    Returns:
+        Tuple of (incoming, outgoing) dicts, each mapping node ID to the list
+        of arcs incident to that node.
     """
     ...

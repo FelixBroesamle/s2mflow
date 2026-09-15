@@ -83,12 +83,7 @@ for i, (u, v, idx) in enumerate(mc.edges):
     )
 
 # 6. Flow conservation — parallel-safe per-node arc lists
-in_arcs  = {n: [] for n in mc.nodes}
-out_arcs = {n: [] for n in mc.nodes}
-for arc in mc.edges:
-    u, v, _ = arc
-    out_arcs[u].append(arc)
-    in_arcs[v].append(arc)
+in_arcs, out_arcs = s2mflow.get_incidence_mapping(mc.nodes, mc.edges)
 
 for k in range(mc.num_commodities):
     for node in mc.nodes:
@@ -146,12 +141,7 @@ model.addConstrs(
 )
 
 # 6. Flow Conservation Constraints
-in_arcs  = {n: [] for n in net.nodes}
-out_arcs = {n: [] for n in net.nodes}
-for arc in net.arcs:
-    u, v, _ = arc
-    out_arcs[u].append(arc)
-    in_arcs[v].append(arc)
+in_arcs, out_arcs = s2mflow.get_incidence_mapping(net.nodes, net.arcs)
 
 for k in range(mc_data.num_commodities):
     for node in net.nodes:

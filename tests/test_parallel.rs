@@ -93,6 +93,21 @@ fn small_parallel_generate_and_round_trip() {
 }
 
 #[test]
+fn incidence_mapping() {
+    let p = write("s2mflow_small_par.min", SMALL);
+    let net = load_min_instance(p.to_str().unwrap().to_string()).unwrap();
+
+    let (in_arcs, out_arcs) =
+        s2mflow::get_incidence_mapping(net.nodes.clone(), net.arcs.clone());
+
+    assert_eq!(out_arcs[&1], vec![(1, 2, 0), (1, 2, 1), (1, 3, 0)]);
+    assert_eq!(in_arcs[&2],  vec![(1, 2, 0), (1, 2, 1)]);
+    assert_eq!(in_arcs[&3],  vec![(2, 3, 0), (1, 3, 0)]);
+    assert!(out_arcs[&3].is_empty());
+    assert!(in_arcs[&1].is_empty());
+}
+
+#[test]
 fn gridgen_parse_integrity() {
     let Some(net) = load_gridgen() else { return };
 

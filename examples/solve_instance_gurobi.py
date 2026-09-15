@@ -59,12 +59,7 @@ def solve_mcmcf_framework_gurobi(
     )
 
     # 5. Flow conservation — parallel-safe per-node arc lists
-    in_arcs  = {n: [] for n in nodes}
-    out_arcs = {n: [] for n in nodes}
-    for arc in base_edges:
-        u, v, _ = arc
-        out_arcs[u].append(arc)
-        in_arcs[v].append(arc)
+    in_arcs, out_arcs = s2mflow.get_incidence_mapping(nodes, base_edges)
 
     for k in range(num_commodities):
         for node in nodes:

@@ -75,6 +75,16 @@ def test_small_parallel_round_trip(tmp_path):
         assert ld.commodity_capacities[(u, v, idx)] == md.capacities_by_arc[i]
         assert ld.commodity_weights[(u, v, idx)]    == md.weights_by_arc[i]
 
+def test_incidence_mapping(tmp_path):
+    net = s2mflow.load_min_instance(_write(tmp_path, "s.min", SMALL))
+    in_arcs, out_arcs = s2mflow.get_incidence_mapping(net.nodes, net.arcs)
+
+    # Node 1 has two outgoing arcs to node 2 (parallel) plus one to node 3.
+    assert out_arcs[1] == [(1, 2, 0), (1, 2, 1), (1, 3, 0)]
+    assert in_arcs[2]  == [(1, 2, 0), (1, 2, 1)]
+    assert in_arcs[3]  == [(2, 3, 0), (1, 3, 0)]
+    assert out_arcs[3] == [] and in_arcs[1] == []
+
 @pytest.mark.skipif(not os.path.exists(GRIDGEN), reason="gridgen file not found")
 def test_gridgen_round_trip(tmp_path):
     net = s2mflow.load_min_instance(GRIDGEN)

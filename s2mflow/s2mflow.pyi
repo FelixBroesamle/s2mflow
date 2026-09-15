@@ -21,7 +21,7 @@ class NetworkInstance:
     nodes: List[int]
     edges: List[Edge]
     supplies: Dict[int, int]
-    arcs: List[Tuple[int, int]]
+    arcs: List[Tuple[int, int, int]]
     capacities: List[int]
     weights: List[int]
 
@@ -38,7 +38,11 @@ class MultiCommoditySupplies:
     partition: Dict[int, List[int]]
 
 class MultiCommodityData:
-    """The generated multicommodity data structure, lifting the base network into K dimensions."""
+    """The generated multicommodity data structure, lifting the base network into K dimensions.
+    
+    ``commodity_edges`` is a list of 4-tuples ``(k, tail, head, index)``.
+    ``commodity_capacities`` and ``commodity_weights`` are keyed by ``(tail, head, index)``.
+    """
     supply_partition: Dict[int, List[int]]
     method: int
     commodity_edges: List[Tuple[int, int, int, int]]
@@ -71,7 +75,7 @@ class ParsedMulticommodityInstance:
     commodity_supply_demand_data: Dict[int, List[int]]
     capacities: List[int]
     commodity_capacities: Dict[Tuple[int, int, int], List[int]]
-    commodity_weights: Dict[tuple[int, int, int], List[int]]
+    commodity_weights: Dict[Tuple[int, int, int], List[int]]
     commodity_edges: List[Tuple[int, int, int, int]]
     commodity_bundle_capacities: List[int]
     start_nodes: List[int]

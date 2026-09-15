@@ -8,8 +8,8 @@ mc = s2mflow.load_multi_commodity_instance("data/net_instance_1/netgen_1_5.mcfmi
 model = pyo.ConcreteModel("MCMCF_Model")
 
 # 3. Define Decision Variables with Edge-Wise Capacity Bounds: 0 <= x_e^k <= u_e^k
-def commodity_edge_bounds(m, k, u, v):
-    upper_bound = mc.commodity_capacities[(u, v)][k]
+def commodity_edge_bounds(m, k, u, v, idx):
+    upper_bound = mc.commodity_capacities[(u, v, idx)][k]
     return (0.0, float(upper_bound))
 
 model.flow = pyo.Var(
@@ -22,29 +22,34 @@ model.flow = pyo.Var(
 # 4. Objective Function: Minimize total routing cost over all commodities
 model.obj = pyo.Objective(
     expr=sum(
-        model.flow[k, u, v] * mc.commodity_weights[(u, v)][k]
-        for (k, u, v) in mc.commodity_edges
+        model.flow[k, u, v, idx] * mc.commodity_weights[(u, v, idx)][k]
+        for (k, u, v, idx) in mc.commodity_edges
     ),
     sense=pyo.minimize
 )
 
 # 5. Shared Mutual Capacity Constraints: sum_k (x_e^k) <= u_e
 model.shared_caps = pyo.ConstraintList()
-for i, edge in enumerate(mc.edges):  # loops through sequential arc structures
-    u, v = edge[0], edge[1]
+for i, (u, v, idx) in enumerate(mc.edges): 
     shared_cap = mc.capacities[i]
     model.shared_caps.add(
-        sum(model.flow[k, u, v] for k in range(mc.num_commodities)) <= shared_cap
+        sum(model.flow[k, u, v, idx] for k in range(mc.num_commodities)) <= shared_cap
     )
 
 # 6. Flow Conservation Constraints (Local Balance System)
 model.flow_balance = pyo.ConstraintList()
-incoming, outgoing = s2mflow.get_adjacency_mapping(mc.nodes, mc.edges)
+
+in_arcs  = {n: [] for n in mc.nodes}
+out_arcs = {n: [] for n in mc.nodes}
+for arc in mc.edges:
+    u, v, _ = arc
+    out_arcs[u].append(arc)
+    in_arcs[v].append(arc)
 
 for k in range(mc.num_commodities):
     for node in mc.nodes:
-        in_flow = sum(model.flow[k, u, node] for u in incoming.get(node, []))
-        out_flow = sum(model.flow[k, node, v] for v in outgoing.get(node, []))
+        in_flow = sum(model.flow[k, u, v, idx] for (u, v, idx) in in_arcs[node])
+        out_flow = sum(model.flow[k, u, v, idx] for (u, v, idx) in out_arcs[node])
         
         # Pull demand vector or fallback to balanced zero
         demand = mc.commodity_supply_demand_data[node][k] if node in mc.commodity_supply_demand_data else 0.0

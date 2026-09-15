@@ -49,18 +49,18 @@ import pyomo.environ as pyo
 import s2mflow
 
 # 1. Load multi-commodity benchmark instance
-mc = s2mflow.load_multi_commodity_instance("data/spread_full.mcfmin")
+mc = s2mflow.load_multi_commodity_instance("spread_full.mcfmin")
 
 # 2. Initialize Model
 model = pyo.ConcreteModel("MCMCF")
 
 # 3. Decision Variables: 0 <= x_e^k <= u_e^k
-def commodity_edge_bounds(m, k, u, v):
-    upper_bound = mc.commodity_capacities[(u, v)][k]
+def commodity_edge_bounds(m, k, u, v, idx):
+    upper_bound = mc.commodity_capacities[(u, v, idx)][k]
     return (0.0, float(upper_bound))
 
 model.flow = pyo.Var(
-    mc.commodity_edges,
+    mc.commodity_edges,    # (k, u, v, idx)
     domain=pyo.NonNegativeReals,
     bounds=commodity_edge_bounds,
     name="x"
@@ -69,27 +69,31 @@ model.flow = pyo.Var(
 # 4. Objective: Minimize total routing cost
 model.obj = pyo.Objective(
     expr=sum(
-        model.flow[k, u, v] * mc.commodity_weights[(u, v)][k]
-        for (k, u, v) in mc.commodity_edges
+        model.flow[k, u, v, idx] * mc.commodity_weights[(u, v, idx)][k]
+        for (k, u, v, idx) in mc.commodity_edges
     ),
     sense=pyo.minimize
 )
 
 # 5. Shared Mutual Capacity Constraints
 model.shared_caps = pyo.ConstraintList()
-for i, (u, v) in enumerate(mc.edges):
+for i, (u, v, idx) in enumerate(mc.edges):
     model.shared_caps.add(
-        sum(model.flow[k, u, v] for k in range(mc.num_commodities)) <= mc.capacities[i]
+        sum(model.flow[k, u, v, idx] for k in range(mc.num_commodities)) <= mc.capacities[i]
     )
 
-# 6. Flow Conservation Constraints
-model.flow_balance = pyo.ConstraintList()
-incoming, outgoing = s2mflow.get_adjacency_mapping(mc.nodes, mc.edges)
+# 6. Flow conservation — parallel-safe per-node arc lists
+in_arcs  = {n: [] for n in mc.nodes}
+out_arcs = {n: [] for n in mc.nodes}
+for arc in mc.edges:
+    u, v, _ = arc
+    out_arcs[u].append(arc)
+    in_arcs[v].append(arc)
 
 for k in range(mc.num_commodities):
     for node in mc.nodes:
-        in_flow = sum(model.flow[k, u, node] for u in incoming.get(node, []))
-        out_flow = sum(model.flow[k, node, v] for v in outgoing.get(node, []))
+        in_flow = sum(model.flow[k, u, v, idx] for (u, v, idx) in in_arcs[node])
+        out_flow = sum(model.flow[k, u, v, idx] for (u, v, idx) in out_arcs[node])
         
         demand = mc.commodity_supply_demand_data[node][k] if node in mc.commodity_supply_demand_data else 0.0
         model.flow_balance.add(out_flow - in_flow == demand)
@@ -98,7 +102,6 @@ for k in range(mc.num_commodities):
 solver = pyo.SolverFactory("highs")
 results = solver.solve(model, tee=True)
 print(f"[+] Optimal Objective Value: {pyo.value(model.obj)}")
-
 ```
 
 ## 3. In-Memory Generation with Gurobi (Commercial Solver)
@@ -112,14 +115,14 @@ import gurobipy as grb
 import s2mflow
 
 # 1. Load baseline and generate data in-memory
-net = s2mflow.load_min_instance("data/input.min")
+net = s2mflow.load_min_instance("input.min")
 mc_data = s2mflow.generate_multi_commodity_data(net, num_commodities=3, method=0, seed=512)
 
 # 2. Initialize Gurobi Model
 model = grb.Model("MCMCF")
 
 # 3. Decision Variables
-upper_bounds = [mc_data.commodity_capacities[(u, v)][k] for (k, u, v) in mc_data.commodity_edges]
+upper_bounds = [mc_data.commodity_capacities[(u, v, idx)][k] for (k, u, v, idx) in mc_data.commodity_edges]
 flow = model.addVars(
     mc_data.commodity_edges, 
     lb=0.0, 
@@ -130,24 +133,30 @@ flow = model.addVars(
 
 # 4. Objective Function
 model.setObjective(
-    grb.quicksum(flow[k, u, v] * mc_data.commodity_weights[(u, v)][k] for (k, u, v) in mc_data.commodity_edges),
+    grb.quicksum(flow[k, u, v, idx] * mc_data.commodity_weights[(u, v, idx)][k] for (k, u, v, idx) in mc_data.commodity_edges),
     sense=grb.GRB.MINIMIZE
 )
 
 # 5. Shared Mutual Capacity Constraints
 model.addConstrs(
     (
-        grb.quicksum(flow[k, u, v] for k in range(mc_data.num_commodities)) <= net.capacities[i]
-        for i, (u, v) in enumerate(net.arcs)
+        grb.quicksum(flow[k, u, v, idx] for k in range(mc_data.num_commodities)) <= net.capacities[i]
+        for i, (u, v, idx) in enumerate(net.arcs)
     ), name="Shared_Cap"
 )
 
 # 6. Flow Conservation Constraints
-incoming, outgoing = s2mflow.get_adjacency_mapping(net.nodes, net.arcs)
+in_arcs  = {n: [] for n in net.nodes}
+out_arcs = {n: [] for n in net.nodes}
+for arc in net.arcs:
+    u, v, _ = arc
+    out_arcs[u].append(arc)
+    in_arcs[v].append(arc)
+
 for k in range(mc_data.num_commodities):
     for node in net.nodes:
-        in_flow = grb.quicksum(flow[k, u, node] for u in incoming.get(node, []))
-        out_flow = grb.quicksum(flow[k, node, v] for v in outgoing.get(node, []))
+        in_flow = grb.quicksum(flow[k, u, v, idx] for (u, v, idx) in in_arcs[node])
+        out_flow = grb.quicksum(flow[k, u, v, idx] for (u, v, idx) in out_arcs[node])
         
         demand = mc_data.supply_partition[node][k] if node in mc_data.supply_partition else 0.0
         model.addConstr(
@@ -157,7 +166,6 @@ for k in range(mc_data.num_commodities):
 
 # 7. Solve
 model.optimize()
-if model.Status == grb.GRB.OPTIMAL:
+if model.Status == GRB.OPTIMAL:
     print(f"[+] Optimal Objective Value: {model.ObjVal}")
-
 ```

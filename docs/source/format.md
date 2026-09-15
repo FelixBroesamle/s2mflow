@@ -12,7 +12,7 @@ An `.mcfmin` file consists of three types of lines:
 ---
 
 ## 1. The Problem Line
-**Syntax:** `p min <num_nodes> <num_edges> <num_commodities> <randomize_caps> <randomize_costs> <method> <seed>`
+**Syntax:** `p min <num_nodes> <num_edges> <num_commodities> <randomize_caps> <randomize_costs> <method> <cap_zero> <cap_zero_param> <seed>`
 
 * `randomize_caps` (0 or 1): Flag indicating if commodity-specific capacities are used.
 * `randomize_costs` (0 or 1): Flag indicating if commodity-specific costs are used.

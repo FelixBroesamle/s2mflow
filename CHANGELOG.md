@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this
 
+## [0.3.1] - 2026-09-15
+### Added
+- Added `get_incidence_mapping`, a per-node incoming/outgoing arc map over full `(tail, head, index)` triples.
+
 ## [0.3.0] - 2026-09-15
 ### Added
 - Added `parallel` and `num_parallel_arc_pairs` metadata to `NetworkInstance`, and `parallel` to `MultiCommodityData` and `ParsedMulticommodityInstance`.

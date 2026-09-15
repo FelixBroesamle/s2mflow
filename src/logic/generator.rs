@@ -1,4 +1,3 @@
-use core::panic;
 use std::collections::BTreeMap;
 use rand::prelude::*;
 use rand::{SeedableRng};
@@ -367,14 +366,16 @@ pub fn generate_multi_commodity_data(
 
     let num_original_edges = instance.edges.len();
 
-    let mut weights_by_arc = BTreeMap::new();
-    let mut capacities_by_arc = BTreeMap::new();
-    let mut commodity_capacities = BTreeMap::new();
-    let mut commodity_weights = BTreeMap::new();
-    let mut commodity_edges = Vec::with_capacity(num_commodities * num_original_edges);
-    let mut base_capacities = Vec::with_capacity(num_commodities * num_original_edges);
+    let mut weights_by_arc:BTreeMap<usize, Vec<i64>> = BTreeMap::new();
+    let mut capacities_by_arc:BTreeMap<usize, Vec<i64>> = BTreeMap::new();
 
-    let mut original_capacities = Vec::with_capacity(num_original_edges);
+    let mut commodity_capacities: BTreeMap<(i64, i64, i64), Vec<i64>> = BTreeMap::new();
+    let mut commodity_weights: BTreeMap<(i64, i64, i64), Vec<i64>> = BTreeMap::new();
+
+    let mut commodity_edges: Vec<(usize, i64, i64, i64)> = Vec::with_capacity(num_commodities * num_original_edges);
+    let mut base_capacities:Vec<i64> = Vec::with_capacity(num_commodities * num_original_edges);
+
+    let mut original_capacities:Vec<i64> = Vec::with_capacity(num_original_edges);
 
     for (i, edge) in instance.edges.iter().enumerate() {
         let c_f64 = edge.cost as f64;
@@ -391,11 +392,15 @@ pub fn generate_multi_commodity_data(
         original_capacities.push(edge.up);
 
         for k in 0..num_commodities {
-            commodity_edges.push((k, edge.tail, edge.head));
+            commodity_edges.push((k, edge.tail, edge.head, edge.index));
             base_capacities.push(edge.up);
 
             let cost = if randomize_costs {
-                let raw_cost = rng.random_range(cost_low..cost_high);
+                let raw_cost = if cost_high > cost_low {
+                    rng.random_range(cost_low..cost_high)
+                } else {
+                    cost_low
+                };
                 let floor_val = if edge.cost == 0 { 0 } else { 1 };
                 (raw_cost.ceil() as i64).max(floor_val)
             } else {
@@ -404,14 +409,20 @@ pub fn generate_multi_commodity_data(
             arc_costs.push(cost);
 
             let cap = if randomize_caps {
-                (rng.random_range(cap_low..cap_high).ceil() as i64).max(1)
+                let sampled = if cap_high > cap_low {
+                    rng.random_range(cap_low..cap_high).ceil() as i64
+                } else {
+                    cap_low.ceil() as i64
+                };
+                sampled.max(1)
             } else {
                 edge.up
             };
+
             arc_caps.push(cap);
         }
 
-        let arc_key = (edge.tail, edge.head);
+        let arc_key = (edge.tail, edge.head, edge.index);
         weights_by_arc.insert(i, arc_costs.clone());
         capacities_by_arc.insert(i, arc_caps.clone());
         commodity_weights.insert(arc_key, arc_costs);
@@ -429,7 +440,7 @@ pub fn generate_multi_commodity_data(
         );
         // Re-insert updated capacities into commodity_capacities.
         for (i, edge) in instance.edges.iter().enumerate() {
-            let arc_key = (edge.tail, edge.head);
+            let arc_key = (edge.tail, edge.head, edge.index);
             if let Some(caps) = capacities_by_arc.get(&i) {
                 commodity_capacities.insert(arc_key, caps.clone());
             }
@@ -437,7 +448,7 @@ pub fn generate_multi_commodity_data(
     }
 
 
-    let mut weight = Vec::with_capacity(num_commodities);
+    let mut weight: Vec<Vec<i64>> = Vec::with_capacity(num_commodities);
     for k in 0..num_commodities {
         let w: Vec<i64> = (0..num_original_edges).map(|i| weights_by_arc[&i][k]).collect();
         weight.push(w);
@@ -459,6 +470,8 @@ pub fn generate_multi_commodity_data(
         cap_zero: cap_zero,
         cap_zero_param: cap_zero_param,
         seed: seed,
+        parallel: instance.parallel,
+        arc_indices: instance.arc_indices.clone(),
     }
 
 }

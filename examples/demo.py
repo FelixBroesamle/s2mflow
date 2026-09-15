@@ -5,6 +5,7 @@ import s2mflow
 if __name__ == "__main__":
     SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__)) if "__file__" in locals() else "."
     EXAMPLES_DIR = os.path.abspath(SCRIPT_DIR)
+    PROJECT_ROOT = os.path.dirname(EXAMPLES_DIR)
     os.makedirs(EXAMPLES_DIR, exist_ok=True)
 
     # Single-Commodity Network (DIMACS .min)
@@ -264,6 +265,72 @@ if __name__ == "__main__":
     print(beta_binomial_multi_data)
     print(s2mflow.compute_commodity_demand_heterogeneity(beta_binomial_multi_data, data))
 
-    incoming, outgoing = s2mflow.get_adjacency_mapping(network.nodes, network.arcs)
+    incoming, outgoing = s2mflow.get_adjacency_mapping(network.nodes, network.topology())
     #print(incoming)
     #print(outgoing)
+
+    print("=" * 20, "Parallel-arc extension (0.3.0)", "=" * 20)
+
+    # 1) Synthetic parallel instance: two arcs share the pair (1, 2) 
+    PARALLEL_DATA = textwrap.dedent("""\
+        c min 3 4
+        n 1 10
+        n 3 -10
+        a 1 2 0 6 3
+        a 1 2 0 4 2
+        a 2 3 0 10 1
+        a 1 3 0 10 5
+    """)
+    parallel_file = os.path.join(EXAMPLES_DIR, "exp_parallel.min")
+    with open(parallel_file, "w") as f:
+        f.write(PARALLEL_DATA)
+
+    pnet = s2mflow.load_min_instance(parallel_file)
+
+    print(f"  parallel            = {pnet.parallel}")
+    print(f"  num_parallel_pairs  = {pnet.num_parallel_arc_pairs}")
+    print(f"  arcs (tail, head, idx) = {pnet.arcs}")
+    print(f"  arc_indices         = {pnet.arc_indices}")
+
+    pmd = s2mflow.generate_multi_commodity_data(
+        pnet, num_commodities=NUM_COMMODITIES, method=0, seed=SEED,
+    )
+    unique = len(pmd.commodity_capacities) == len(pnet.edges) == len(pnet.edges)
+    print(f"  |edges| = {len(pnet.edges)}   |commodity_capacities| = {len(pmd.commodity_capacities)}"
+          f"   unique keys = {unique}")
+
+    pout = os.path.join(EXAMPLES_DIR, "exp_parallel.mcfmin")
+    s2mflow.save_multi_commodity_instance(pout, pnet, pmd)
+    pld = s2mflow.load_multi_commodity_instance(pout)
+    print(f"  round-trip parallel = {pld.parallel}, "
+          f"keys preserved = {len(pld.commodity_capacities) == len(pnet.edges)}")
+
+     # -- 2) Real gridgen instance: run only if the data file is present ----------
+    gridgen = os.path.join(PROJECT_ROOT, "data", "gridgen_1", "smcg_gridgen_1.min")
+    if os.path.exists(gridgen):
+        print("\n  -- Real gridgen instance --")
+        gnet = s2mflow.load_min_instance(gridgen)
+        print(f"  nodes / arcs        = {gnet.num_nodes} / {gnet.num_arcs}")
+        print(f"  parallel            = {gnet.parallel}")
+        print(f"  parallel pairs      = {gnet.num_parallel_arc_pairs}")
+
+        gmd = s2mflow.generate_multi_commodity_data(
+            gnet, num_commodities=NUM_COMMODITIES, method=0, seed=SEED,
+        )
+        unique = len(gmd.commodity_capacities) == len(gnet.edges)
+        print(f"  |edges|             = {len(gnet.edges)}")
+        print(f"  |commodity_caps|    = {len(gmd.commodity_capacities)}   unique keys = {unique}")
+
+        
+        gout = os.path.join(EXAMPLES_DIR, "gridgen_1.mcfmin")
+        s2mflow.save_multi_commodity_instance(gout, gnet, gmd)
+        gld = s2mflow.load_multi_commodity_instance(gout)
+        print(f"  round-trip parallel = {gld.parallel}, "
+              f"keys preserved = {len(gld.commodity_capacities) == len(gnet.edges)}")
+    else:
+        print(f"\n  [gridgen demo skipped — {gridgen} not found]")
+
+    print("=" * 60)
+    print("Demo complete.")
+    print("=" * 60)
+    

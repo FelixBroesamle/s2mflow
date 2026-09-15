@@ -68,7 +68,7 @@ def test_round_trip(
         assert loaded_mc_data.commodity_supply_demand_data[node_id] == gen_vals
     
     for i, edge in enumerate(network.edges):
-        arc_key = (edge.tail, edge.head)
+        arc_key = (edge.tail, edge.head, edge.index)
         assert loaded_mc_data.commodity_capacities[arc_key] == generated_mc_data.capacities_by_arc[i]
         assert loaded_mc_data.commodity_weights[arc_key] == generated_mc_data.weights_by_arc[i]
 
@@ -113,5 +113,5 @@ def test_round_trip_zero_capacity(tmp_path):
 
         # Compare all commodity capacities
         for i, edge in enumerate(network.edges):
-            arc_key = (edge.tail, edge.head)
+            arc_key = (edge.tail, edge.head, edge.index)
             assert loaded.commodity_capacities[arc_key] == generated.capacities_by_arc[i]

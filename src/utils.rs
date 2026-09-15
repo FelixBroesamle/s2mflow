@@ -17,13 +17,16 @@ pub fn parse_min(path: &str) -> Result<NetworkInstance, Box<dyn std::error::Erro
     let mut capacities = Vec::new();
     let mut weights = Vec::new();
 
+    let mut pair_counter: BTreeMap<(i64, i64), i64> = BTreeMap::new();
+    let mut arc_indices: BTreeMap<(i64, i64), Vec<usize>> = BTreeMap::new();
+
     for line in reader.lines() {
         let l = line?;
-        if l.is_empty() || l.starts_with('c') || l.starts_with(' ') {
-            continue;
-        }
+        let trimmed = l.trim();
+        
+        if trimmed.is_empty() || trimmed.starts_with('c') {continue};
 
-        let tokens: Vec<&str> = l.split_whitespace().collect();
+        let tokens: Vec<&str> = trimmed.split_whitespace().collect();
         if tokens.is_empty() { continue }
 
         match tokens[0] {
@@ -53,7 +56,12 @@ pub fn parse_min(path: &str) -> Result<NetworkInstance, Box<dyn std::error::Erro
                 let up: i64= tokens[4].parse()?;
                 let cost: i64 = tokens[5].parse()?;
 
-                edges.push(Edge { tail, head, low, up, cost });
+                let slot = pair_counter.entry((tail, head)).or_insert(-1);
+                *slot += 1;
+                let index = *slot;
+
+                let position = edges.len();
+                edges.push(Edge { tail, head, low, up, cost, index });
 
                 for &node in &[tail, head] {
                     if node_seen.insert(node) {
@@ -61,13 +69,17 @@ pub fn parse_min(path: &str) -> Result<NetworkInstance, Box<dyn std::error::Erro
                     }
                 }
 
-                arcs.push((tail, head));
+                arcs.push((tail, head, index));
                 capacities.push(up);
                 weights.push(cost);
+                arc_indices.entry((tail, head)).or_default().push(position);
             }
             _ => {}
         }
     }
+
+    let num_parallel_arc_pairs = arc_indices.values().filter(|v| v.len() > 1).count();
+    let parallel = num_parallel_arc_pairs > 0;
 
     Ok(NetworkInstance {
         num_nodes,
@@ -78,6 +90,9 @@ pub fn parse_min(path: &str) -> Result<NetworkInstance, Box<dyn std::error::Erro
         arcs,
         capacities,
         weights,
+        parallel,
+        num_parallel_arc_pairs,
+        arc_indices,
     })
 }
 
@@ -88,7 +103,7 @@ pub fn parse_multi_min(path: &str) -> Result<ParsedMulticommodityInstance, Box<d
 
     let mut num_nodes = 0;
     let mut num_arcs = 0;
-    let mut num_commodities = 0;
+    let mut num_commodities: usize = 0;
     let mut rand_caps = false;
     let mut rand_costs = false;
     let mut seed = 0;
@@ -107,6 +122,9 @@ pub fn parse_multi_min(path: &str) -> Result<ParsedMulticommodityInstance, Box<d
     let mut commodity_weights = BTreeMap::new();
     let mut start_nodes = Vec::new();
     let mut end_nodes = Vec::new();
+
+    let mut arc_indices: BTreeMap<(i64, i64), Vec<usize>> = BTreeMap::new();
+    let mut pair_counter: BTreeMap<(i64, i64), i64> = BTreeMap::new();
 
     for line in reader.lines() {
         let l = line?;
@@ -142,9 +160,7 @@ pub fn parse_multi_min(path: &str) -> Result<ParsedMulticommodityInstance, Box<d
 
             "n" => {
                 let node_id: i64 = tokens[1].parse::<i64>()?;
-                
                 let supply_val: i64 = tokens[2].parse::<i64>()?;
-
                 let supply_vals: Vec<i64> = tokens[3..].iter().map(|&t| t.parse::<i64>()).collect::<Result<Vec<_>, _>>()?;
 
                 supplies.insert(node_id, supply_val);
@@ -161,7 +177,7 @@ pub fn parse_multi_min(path: &str) -> Result<ParsedMulticommodityInstance, Box<d
                 let v: i64 = tokens[2].parse::<i64>()?;
                 let up: i64 = tokens[4].parse()?;
 
-                let k = num_commodities as usize;
+                let k = num_commodities;
                 let mut current_idx = 5;
 
                 let parsed_caps: Vec<i64> = if has_multi_caps {
@@ -182,13 +198,22 @@ pub fn parse_multi_min(path: &str) -> Result<ParsedMulticommodityInstance, Box<d
                     vec![val; k]
                 };
 
-                edges.push((u, v));
+                let slot = pair_counter.entry((u, v)).or_insert(-1);
+                *slot += 1;
+                let index = *slot;
+
+                let position = edges.len();
+
+                edges.push((u, v, index));
                 capacities.push(up);
-                commodity_capacities.insert((u, v), parsed_caps);
-                commodity_weights.insert((u, v), parsed_costs);
                 start_nodes.push(u);
                 end_nodes.push(v);
+                arc_indices.entry((u, v)).or_default().push(position);
                 
+                let key = (u, v, index);
+                commodity_capacities.insert(key, parsed_caps);
+                commodity_weights.insert(key, parsed_costs);
+
                 for &node in &[u, v] {
                     if node_seen.insert(node) {
                         nodes.push(node);
@@ -199,22 +224,27 @@ pub fn parse_multi_min(path: &str) -> Result<ParsedMulticommodityInstance, Box<d
         }
     }
 
-    let mut commodity_edges = Vec::with_capacity(num_commodities as usize * edges.len());
-    for i in 0..num_commodities {
-        for &(u, v) in &edges {
-            commodity_edges.push((i, u, v));
+    let num_parallel_arc_pairs  = arc_indices.values().filter(|v| v.len() > 1).count();
+    let parallel = num_parallel_arc_pairs > 0;
+
+    let mut commodity_edges = Vec::with_capacity(num_commodities * edges.len());
+    for k in 0..num_commodities {
+        for &(u, v, idx) in &edges {
+            commodity_edges.push((k, u, v, idx));
         }
     }
 
-    let mut commodity_bundle_capacities = Vec::with_capacity(num_commodities as usize * capacities.len());
-    for _ in 0..num_commodities {
-        commodity_bundle_capacities.extend_from_slice(&capacities);
+    let mut commodity_bundle_capacities = Vec::with_capacity(num_commodities * capacities.len());
+    for k in 0..num_commodities {
+        for &(u, v, idx) in &edges {
+            commodity_bundle_capacities.push(commodity_capacities[&(u, v, idx)][k]);
+        }
     }
 
     Ok(ParsedMulticommodityInstance { 
         num_nodes: num_nodes, 
         num_arcs: num_arcs, 
-        num_commodities: num_commodities as usize,
+        num_commodities: num_commodities,
         randomized_capacities: rand_caps,
         randomized_weights: rand_costs, 
         nodes: nodes, 
@@ -231,6 +261,9 @@ pub fn parse_multi_min(path: &str) -> Result<ParsedMulticommodityInstance, Box<d
         cap_zero: cap_zero,
         cap_zero_param: cap_zero_param,
         seed: seed,
+        parallel: parallel,
+        arc_indices: arc_indices,
+        commodity_bundle_capacities: commodity_bundle_capacities,
     })
 }
 
@@ -254,9 +287,9 @@ pub fn export_to_dimacs(
     writeln!(writer, "c Multicommodity flow generated by s2mflow")?;
 
     // 2. Problem Line: p min <nodes> <arcs> <commodities>
-    let rand_caps_int = if multi_data.randomized_capacities { 1 } else { 0 };
-    let rand_costs_int = if multi_data.randomized_weights { 1 } else { 0 };
-    let cap_zero_int = if multi_data.cap_zero  { 1 } else { 0 };
+    let rand_caps_int = multi_data.randomized_capacities as i64;
+    let rand_costs_int = multi_data.randomized_weights as i64;
+    let cap_zero_int = multi_data.cap_zero  as i64;
 
     // p min num_nodes num_arcs num_commodities rand_caps rand_costs is_uniform seed
     writeln!(
@@ -281,6 +314,7 @@ pub fn export_to_dimacs(
     }
 
     // 4. Arc Lines: a <tail> <head> <low> <upp> <cost_c1> <cost_c2> ...
+    // Writing `instance.edges` in order guarantees that the k-th occurrence of (tail, head) gets index k-1 on round-trip.
     for (i, edge) in instance.edges.iter().enumerate() {
         let caps = &multi_data.capacities_by_arc[&i];
         let costs = &multi_data.weights_by_arc[&i];
@@ -316,13 +350,13 @@ pub fn get_adjacency_mapping(
     let mut outgoing: BTreeMap<i64, Vec<i64>> = BTreeMap::new();
 
     for &node in &nodes {
-        incoming.insert(node, Vec::new());
-        outgoing.insert(node, Vec::new());
+        incoming.entry(node).or_default();
+        outgoing.entry(node).or_default();
     }
 
     for (tail, head) in edges {
-        incoming.get_mut(&head).unwrap().push(tail);
-        outgoing.get_mut(&tail).unwrap().push(head);
+        incoming.entry(head).or_default().push(tail);
+        outgoing.entry(tail).or_default().push(head);
     }
 
     (incoming, outgoing)
